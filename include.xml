@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension>
+
+	<haxelib name="types" />
+	<haxelib name="filesystem_ios" if="ios" />
+	<haxelib name="filesystem_ios" if="mac" />
+	<haxelib name="filesystem_android" if="android" />
+
+</extension>
