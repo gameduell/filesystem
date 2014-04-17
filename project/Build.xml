@@ -1,0 +1,43 @@
+<xml>
+	
+	<include name="${HXCPP}/build-tool/BuildCommon.xml"/>
+	
+	<set name="mobile" value="1" if="iphone"/>
+	<set name="mobile" value="1" if="android"/>
+	<set name="mobile" value="1" if="blackberry"/>
+	<set name="mobile" value="1" if="webos"/>
+	
+	<files id="src">
+		
+		<include name="${haxelib:types_cpp}/native.xml" />
+
+		<compilerflag value="-Iinclude"/>
+		<file name="src/FilesystemNativeInterface.cpp"/>
+		<file name="src/FileHandle.cpp"/>
+		
+	</files>
+	
+	<set name="ARM_ARCH" value="-v7" if="HXCPP_ARMV7"/>
+	<set name="name_extra" value="${ARM_ARCH}" if="android"/>
+
+	<set name="tool" value="exe" />
+	<set name="ndll-tool" value="dll"/>
+	<set name="SLIBEXT" value=".a"/>
+	
+	<target id="NDLL" output="${name_prefix}filesystem_android${debug_extra}${name_extra}" tool="linker" toolid="${ndll-tool}">
+		
+		<outdir name="../ndll/${BINDIR}"/>
+		<ext value=".ndll" unless="mobile"/>
+		<files id="src"/>
+
+		<lib name="-landroid" />
+		
+	</target>
+	
+	<target id="default">
+		
+		<target id="NDLL"/>
+		
+	</target>
+	
+</xml>

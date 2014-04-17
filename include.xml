@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension>
+
+	<haxelib name="types" />
+	<haxelib name="hxjni" />
+
+	<ndll name="filesystem_android" />
+
+	<dependency name="hxfilesystem" path="dependencies/android" if="android" />
+
+</extension>
