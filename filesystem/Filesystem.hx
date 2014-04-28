@@ -10,8 +10,8 @@ extern class Filesystem
 	public function urlToCachedData() : String;
 	public function urlToTempData() : String;
 
-	public function getFileToWrite(url : String) : File;
-	public function getFileToRead(url : String) : File;
+	public function getFileWriter(url : String) : FileWriter;
+	public function getFileReader(url : String) : FileReader;
 	public function createFile(url : String) : Bool;
 	public function createFolder(url : String) : Bool;
 
@@ -19,8 +19,8 @@ extern class Filesystem
 	public function isFolder(url : String) : Bool;
 	public function isFile(url : String) : Bool;
 
-	public function deleteFile(url : String) : File;
-	public function deleteFolder(url : String) : File;
+	public function deleteFile(url : String) : Void;
+	public function deleteFolder(url : String) : Void;
 }
 
 

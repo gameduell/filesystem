@@ -2,9 +2,9 @@ package filesystem;
 
 import types.Data;
 
-extern class File
+extern class FileWrite
 {
-	/// the filesystem creates files
+	/// the filesystem creates the filewriter
 	private function new() : Void;
 
 	public var seekPosition (get, set) : Int;
@@ -12,8 +12,6 @@ extern class File
 	public function seekEndOfFile();
 
 	public function writeFromData(data : Data);
-
-	public function readIntoData(outputData : Data);
 
 	public function close();
 }
