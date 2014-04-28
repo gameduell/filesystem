@@ -3,8 +3,9 @@ package filesystem;
 import types.Data;
 import cpp.Lib;
 
-class File
+class FileReader
 {
+	private var nativeFileHandle : Dynamic;
 
 	public var seekPosition (get, set) : Int;
 
@@ -26,20 +27,12 @@ class File
 		return filesystem_android_seek_end_of_file(nativeFileHandle);
 	}
 
-	private var nativeFileHandle : Dynamic;
-
 	/// the filesystem creates files
 	public function new(nativeFileHandle : Dynamic) : Void 
 	{
 		this.nativeFileHandle = nativeFileHandle;
 	};
-
-	private var filesystem_android_file_write = Lib.load ("filesystem_android", "filesystem_android_file_write", 2);
-	public function writeFromData(data : Data)
-	{
-		filesystem_android_file_write(nativeFileHandle, data.nativeData);
-	}
-
+	
 	private var filesystem_android_file_read = Lib.load ("filesystem_android", "filesystem_android_file_read", 2);
 	public function readIntoData(data : Data)
 	{
