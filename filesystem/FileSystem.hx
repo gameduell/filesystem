@@ -42,18 +42,26 @@ class Filesystem
 	}
 
 	private var filesystem_ios_open_file_write = Lib.load ("filesystem_ios", "filesystem_ios_open_file_write", 1);
-	public function getFileToWrite(url : String) : File
+	public function getFileWriter(url : String) : FileWriter
 	{
 		var nativeHandle = filesystem_ios_open_file_write(url);
-		var file = new File(nativeHandle);
+		
+		if(nativeHandle == null)
+			return null;
+
+		var file = new FileWriter(nativeHandle);
 		return file;
 	}
 
 	private var filesystem_ios_open_file_read = Lib.load ("filesystem_ios", "filesystem_ios_open_file_read", 1);
-	public function getFileToRead(url : String) : File
+	public function getFileReader(url : String) : FileReader
 	{
 		var nativeHandle = filesystem_ios_open_file_read(url);
-		var file = new File(nativeHandle);
+		
+		if(nativeHandle == null)
+			return null;
+
+		var file = new FileReader(nativeHandle);
 		return file;
 	}
 

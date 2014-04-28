@@ -1,15 +1,19 @@
+#ifndef __TYPES_FILE_HANDLE_
+#define __TYPES_FILE_HANDLE_
+
+
 #import <Foundation/Foundation.h>
 #import <hx/CFFI.h>
 
-struct FileHandle
+class FileHandle
 {
-	NSFileHandle *objcFileHandle;
-	static value createHaxePointer();
+	public:
+		NSFileHandle *objcFileHandle;
 
-	~FileHandle();
+		void close();
+		static value createHaxePointer();
 
-
+		~FileHandle();
 };
 
-
-
+#endif //__TYPES_FILE_HANDLE_

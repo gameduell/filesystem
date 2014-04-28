@@ -3,8 +3,9 @@ package filesystem;
 import types.Data;
 import cpp.Lib;
 
-class File
+class FileWriter
 {
+	private var nativeFileHandle : Dynamic;
 
 	public var seekPosition (get, set) : Int;
 
@@ -26,8 +27,6 @@ class File
 		return filesystem_ios_seek_end_of_file(nativeFileHandle);
 	}
 
-	private var nativeFileHandle : Dynamic;
-
 	/// the filesystem creates files
 	public function new(nativeFileHandle : Dynamic) : Void 
 	{
@@ -38,12 +37,6 @@ class File
 	public function writeFromData(data : Data)
 	{
 		filesystem_ios_file_write(nativeFileHandle, data.nativeData);
-	}
-
-	private var filesystem_ios_file_read = Lib.load ("filesystem_ios", "filesystem_ios_file_read", 2);
-	public function readIntoData(data : Data)
-	{
-		filesystem_ios_file_read(nativeFileHandle, data.nativeData);
 	}
 	
 	private var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);

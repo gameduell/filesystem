@@ -249,7 +249,7 @@ static value filesystem_ios_file_close(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
-	[fileHandle->objcFileHandle closeFile];
+	fileHandle->close();
 
 	return alloc_null();
 }
