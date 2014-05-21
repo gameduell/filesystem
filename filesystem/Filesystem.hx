@@ -4,8 +4,6 @@ import platform.Platform;
 
 import types.Data;
 
-import js.html.XMLHttpRequest;
-
 using StringTools;
 
 class Filesystem
