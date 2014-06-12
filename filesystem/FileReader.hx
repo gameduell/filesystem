@@ -35,7 +35,7 @@ class FileReader
 	{
 		fileData.offset = currentSeekPosition;
 		fileData.offsetLength = data.offsetLength;
-		data.setData(fileData);
+		data.writeData(fileData);
 	}
 	
 	public function close()
