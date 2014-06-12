@@ -2,7 +2,7 @@ package filesystem;
 
 import types.Data;
 
-extern class File
+extern class FileReader
 {
 	/// the filesystem creates the filereader
 	private function new() : Void;

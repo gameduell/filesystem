@@ -2,7 +2,7 @@ package filesystem;
 
 import types.Data;
 
-extern class FileWrite
+extern class FileWriter
 {
 	/// the filesystem creates the filewriter
 	private function new() : Void;
