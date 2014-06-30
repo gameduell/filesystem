@@ -1,9 +1,0 @@
-{
-    "name" : "filesystem_ios",
-    "license" : "Closed",
-    "version" : "0.0.1",
-    "description" : "An abstraction layer ios implementation for cross platform filesystem interaction.",
-    "releasenote" : "",
-    "contributors" : [ "GameDuell GmbH" ],
-    "dependencies" : {}
-}
