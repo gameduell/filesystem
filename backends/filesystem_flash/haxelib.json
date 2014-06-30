@@ -1,0 +1,9 @@
+{
+    "name" : "filesystem_flash",
+    "license" : "Closed",
+    "version" : "0.0.1",
+    "description" : "Flash platform filesystem interaction.",
+    "contributors" : [ "GameDuell GmbH" ],
+    "dependencies" : { "air3":"" },
+    "releasenote" : ""
+}
