@@ -1,9 +1,0 @@
-{
-    "name" : "filesystem_android",
-    "license" : "Closed",
-    "version" : "0.0.1",
-    "description" : "An abstraction layer android implementation for cross platform filesystem interaction.",
-    "releasenote" : "",
-    "contributors" : [ "GameDuell GmbH" ],
-    "dependencies" : {}
-}
