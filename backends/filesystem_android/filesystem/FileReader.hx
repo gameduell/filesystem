@@ -31,7 +31,7 @@ class FileReader
 	public function new(nativeFileHandle : Dynamic) : Void 
 	{
 		this.nativeFileHandle = nativeFileHandle;
-	};
+	}
 	
 	private var filesystem_android_file_read = Lib.load ("filesystem_android", "filesystem_android_file_read", 2);
 	public function readIntoData(data : Data)

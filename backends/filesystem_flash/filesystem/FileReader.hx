@@ -25,6 +25,12 @@ class FileReader
 
     public function seekEndOfFile()
     {
+        trace("I am flashy");
+        if (fileData == null)
+        {
+            throw "ERROR in Filesystem";
+        }
+
         currentSeekPosition = fileData.offsetLength;
     }
 
