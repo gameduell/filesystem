@@ -88,14 +88,14 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         var data = new Data(fileSize);
 
-        var str = data.createStringFromData();
+        var str = data.readString();
 
         assertTrue(str != "This is a test file!");
 
         fileRead.readIntoData(data);
 
 
-        str = data.createStringFromData();
+        str = data.readString();
 
         assertEquals("This is a test file!", str);
 
@@ -112,7 +112,7 @@ class FilesystemTest extends haxe.unit.TestCase {
         /// WRITE
         var testFileText = "Test File Text!";
         var inputData : Data = new Data(testFileText.length);
-        inputData.setString(testFileText);
+        inputData.writeString(testFileText);
         var fileWrite = Filesystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
 
@@ -128,12 +128,12 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         var outputData = new Data(fileSize);
 
-        assertTrue(outputData.createStringFromData() != testFileText);
+        assertTrue(outputData.readString() != testFileText);
 
         fileRead.readIntoData(outputData);
 
         /// COMPARE CONTENT
-        assertEquals(testFileText, outputData.createStringFromData());
+        assertEquals(testFileText, outputData.readString());
 
         fileRead.close();
         fileWrite.close();
@@ -208,13 +208,13 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         var data = new Data(fileSize);
 
-        var str = data.createStringFromData();
+        var str = data.readString();
 
         assertTrue(str != "This is a test file!");
 
         fileRead.readIntoData(data);
 
-        str = data.createStringFromData();
+        str = data.readString();
 
         assertTrue(str == "This is a test file!");
 
@@ -230,7 +230,7 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         var testFileText = "Test File Text!";
         var inputData : Data = new Data(testFileText.length);
-        inputData.setString(testFileText);
+        inputData.writeString(testFileText);
 
         var fileWrite = Filesystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
@@ -246,12 +246,12 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         var outputData = new Data(fileSize);
 
-        assertTrue(outputData.createStringFromData() != testFileText);
+        assertTrue(outputData.readString() != testFileText);
 
         assertEquals(outputData.allocedLength, fileSize);
         fileRead.readIntoData(outputData);
 
-        assertEquals(testFileText, outputData.createStringFromData());
+        assertEquals(testFileText, outputData.readString());
 
         fileRead.close();
         fileWrite.close();

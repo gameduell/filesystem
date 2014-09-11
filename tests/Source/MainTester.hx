@@ -1,16 +1,10 @@
-
-import lime.Lime;
-
 import FilesystemTest;
 
-import platform.AppMain;
-import platform.Platform;
-
-class MainTester extends AppMain
+class MainTester
 {
 	public function new() {};
 
-	override public function start () : Void 
+	static public function main() : Void 
 	{
 		var r = new haxe.unit.TestRunner();
 		r.add(new FilesystemTest());

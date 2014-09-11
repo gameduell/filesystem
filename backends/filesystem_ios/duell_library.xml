@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension>
 
-	<haxelib name="types" />
-
-	<ndll name="filesystem_ios" />
+	<ndll name="filesystem_ios" build-file-path="project/Build.xml" bin-path="ndll" />
 
 </extension>

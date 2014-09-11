@@ -1,2 +1,6 @@
 tests/Export
 *.iml
+backends/filesystem_ios/ndll
+backends/filesystem_ios/project/obj
+backends/filesystem_android/ndll
+backends/filesystem_android/project/obj

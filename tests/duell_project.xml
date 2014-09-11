@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<app title="Filesystem Testing" 
+		 file="filesystemtests" 
+		 package="com.gameduell.filesystemtesting" 
+		 version="0.0.1" 
+		 company="GameDuell GmbH" />
+
+	<main name="MainTester" />
+
+	<source path="Source" />
+
+	<duelllib name="filesystem" />
+
+	<library-config>
+		<filesystem>
+			<static-assets path="Assets" />
+		</filesystem>
+	</library-config>
+
+</project>
+
