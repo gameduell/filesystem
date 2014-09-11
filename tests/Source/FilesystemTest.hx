@@ -1,5 +1,7 @@
 import filesystem.Filesystem;
 
+import filesystem.StaticAssetList;
+
 import types.Data;
 using types.DataStringTools;
 
@@ -70,6 +72,24 @@ class FilesystemTest extends haxe.unit.TestCase {
 
         fileRead.close();
         fileWrite.close();
+    }
+
+    public function testStaticAssetList()
+    {
+        var expectedList = [
+        
+            "lime.png",
+            "lime.svg",
+            "TestFile.txt",
+            "TestFileBadCharacters +~@.txt",
+        ];
+
+        assertTrue(expectedList.length == StaticAssetList.list.length);
+
+        for (i in 0...expectedList.length)
+        {
+            assertEquals(expectedList[i], StaticAssetList.list[i]);
+        }
     }
     
     public function testReadFromStatic()

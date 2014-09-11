@@ -71,6 +71,7 @@ class LibraryBuild
 			for (file in files)
 			{
 				fileListToCopy.push({fullPath : Path.join([folder, file]), relativeFilePath : file});
+				LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 			}
 		}
 	}
