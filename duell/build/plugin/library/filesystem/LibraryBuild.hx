@@ -117,6 +117,10 @@ class LibraryBuild
 	{
 		var targetDirectory = Configuration.getData().OUTPUT + "/" + "ios";
 		var projectDirectory = targetDirectory + "/" + Configuration.getData().APP.FILE + "/";
+
+		var targetFolder = Path.join([projectDirectory, "assets"]);
+		PathHelper.mkdir(targetFolder);
+
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([projectDirectory, "assets", Path.directory(file.relativeFilePath)]);
