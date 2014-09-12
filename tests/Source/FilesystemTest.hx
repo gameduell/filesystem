@@ -1,4 +1,4 @@
-import filesystem.Filesystem;
+import filesystem.FileSystem;
 
 import filesystem.StaticAssetList;
 
@@ -9,31 +9,39 @@ using StringTools;
 
 import Date;
 
-class FilesystemTest extends haxe.unit.TestCase {
+class FileSystemTest extends haxe.unit.TestCase {
     
 
     public function new ()
     {
         super();
-        var staticURL = Filesystem.instance().urlToStaticData();
-        var cachedData = Filesystem.instance().urlToCachedData();
-        var tempData = Filesystem.instance().urlToTempData();
 
-        trace("FilesystemURLs");
+        var staticURL = FileSystem.instance().urlToStaticData();
+        var cachedData = FileSystem.instance().urlToCachedData();
+        var tempData = FileSystem.instance().urlToTempData();
+
+        trace("FileSystemURLs");
         trace("static url:" + staticURL);
         trace("cached url:" + cachedData);
         trace("temp url:" + tempData);
 
         #if html5
-        trace("asset list: " + Filesystem.instance().getFileList(staticURL));
+        trace("asset list: " + FileSystem.instance().getFileList(staticURL));
         #end
+
+        var testFolder = ("/testFolder " + Date.now().getTime()).urlEncode();
+        testCacheFolder = FileSystem.instance().urlToCachedData() + testFolder;
+        testTempFolder = FileSystem.instance().urlToTempData() + testFolder;
+
+        FileSystem.instance().createFolder(testCacheFolder);
+        FileSystem.instance().createFolder(testTempFolder);
     }
     
     public function testURLs()
     {
-        var staticURL = Filesystem.instance().urlToStaticData();
-        var cachedData = Filesystem.instance().urlToCachedData();
-        var tempData = Filesystem.instance().urlToTempData();
+        var staticURL = FileSystem.instance().urlToStaticData();
+        var cachedData = FileSystem.instance().urlToCachedData();
+        var tempData = FileSystem.instance().urlToTempData();
 
         assertTrue(staticURL != null && staticURL != "");
         assertTrue(cachedData != null && cachedData != "");
@@ -45,28 +53,23 @@ class FilesystemTest extends haxe.unit.TestCase {
 
     public function testCreation()
     {
-        var testFolder = ("/testFolder " + Date.now().getTime()).urlEncode();
-        testCacheFolder = Filesystem.instance().urlToCachedData() + testFolder;
-        testTempFolder = Filesystem.instance().urlToTempData() + testFolder;
-        assertTrue(Filesystem.instance().createFolder(testCacheFolder));
-        assertTrue(Filesystem.instance().createFolder(testTempFolder));
 
         /// CACHED
         var urlCachedFile = testCacheFolder + "/test.txt";
-        Filesystem.instance().createFile(urlCachedFile);
-        var fileWrite = Filesystem.instance().getFileWriter(urlCachedFile);
+        FileSystem.instance().createFile(urlCachedFile);
+        var fileWrite = FileSystem.instance().getFileWriter(urlCachedFile);
         assertTrue(fileWrite != null);
 
-        var fileRead = Filesystem.instance().getFileReader(urlCachedFile);
+        var fileRead = FileSystem.instance().getFileReader(urlCachedFile);
         assertTrue(fileRead != null);
 
         /// TEMP
         var urlTempFile = testTempFolder + "/test.txt";
-        Filesystem.instance().createFile(urlTempFile);
-        var fileWrite = Filesystem.instance().getFileWriter(urlTempFile);
+        FileSystem.instance().createFile(urlTempFile);
+        var fileWrite = FileSystem.instance().getFileWriter(urlTempFile);
         assertTrue(fileWrite != null);
 
-        var fileRead = Filesystem.instance().getFileReader(urlTempFile);
+        var fileRead = FileSystem.instance().getFileReader(urlTempFile);
         assertTrue(fileRead != null);
 
 
@@ -94,9 +97,9 @@ class FilesystemTest extends haxe.unit.TestCase {
     
     public function testReadFromStatic()
     {
-        var testFileURL = Filesystem.instance().urlToStaticData() + "/TestFile.txt";
+        var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.txt";
 
-        var fileRead = Filesystem.instance().getFileReader(testFileURL);
+        var fileRead = FileSystem.instance().getFileReader(testFileURL);
 
         
         assertTrue(fileRead != null);
@@ -127,17 +130,17 @@ class FilesystemTest extends haxe.unit.TestCase {
     {
         var testFileURL = testCacheFolder + "/TestFile.txt";
 
-        Filesystem.instance().createFile(testFileURL);
+        FileSystem.instance().createFile(testFileURL);
 
         /// WRITE
         var testFileText = "Test File Text!";
         var inputData : Data = new Data(testFileText.length);
         inputData.writeString(testFileText);
-        var fileWrite = Filesystem.instance().getFileWriter(testFileURL);
+        var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
 
         /// READ
-        var fileRead = Filesystem.instance().getFileReader(testFileURL);
+        var fileRead = FileSystem.instance().getFileReader(testFileURL);
 
         var prevSeek = fileRead.seekPosition;
         fileRead.seekEndOfFile();
@@ -166,57 +169,57 @@ class FilesystemTest extends haxe.unit.TestCase {
         var testFileURL = testFolderForCheckingExistence + "/TestFileForExistence.txt";
 
         /// FOLDER
-        assertTrue(!Filesystem.instance().isFolder(testFolderForCheckingExistence));
-        assertTrue(!Filesystem.instance().urlExists(testFolderForCheckingExistence));
-        assertTrue(!Filesystem.instance().isFile(testFolderForCheckingExistence));
+        assertTrue(!FileSystem.instance().isFolder(testFolderForCheckingExistence));
+        assertTrue(!FileSystem.instance().urlExists(testFolderForCheckingExistence));
+        assertTrue(!FileSystem.instance().isFile(testFolderForCheckingExistence));
 
-        assertTrue(Filesystem.instance().createFolder(testFolderForCheckingExistence));
+        assertTrue(FileSystem.instance().createFolder(testFolderForCheckingExistence));
 
-        assertTrue(Filesystem.instance().urlExists(testFolderForCheckingExistence));
-        assertTrue(Filesystem.instance().isFolder(testFolderForCheckingExistence));
-        assertTrue(!Filesystem.instance().isFile(testFolderForCheckingExistence));
+        assertTrue(FileSystem.instance().urlExists(testFolderForCheckingExistence));
+        assertTrue(FileSystem.instance().isFolder(testFolderForCheckingExistence));
+        assertTrue(!FileSystem.instance().isFile(testFolderForCheckingExistence));
 
         /// FILE
-        assertTrue(!Filesystem.instance().isFolder(testFileURL));
-        assertTrue(!Filesystem.instance().urlExists(testFileURL));
-        assertTrue(!Filesystem.instance().isFile(testFileURL));
+        assertTrue(!FileSystem.instance().isFolder(testFileURL));
+        assertTrue(!FileSystem.instance().urlExists(testFileURL));
+        assertTrue(!FileSystem.instance().isFile(testFileURL));
 
-        Filesystem.instance().createFile(testFileURL);
+        FileSystem.instance().createFile(testFileURL);
 
-        assertTrue(!Filesystem.instance().isFolder(testFileURL));
-        assertTrue(Filesystem.instance().urlExists(testFileURL));
-        assertTrue(Filesystem.instance().isFile(testFileURL));
+        assertTrue(!FileSystem.instance().isFolder(testFileURL));
+        assertTrue(FileSystem.instance().urlExists(testFileURL));
+        assertTrue(FileSystem.instance().isFile(testFileURL));
     }
 
     public function testDelete()
     {
         var testFolderForDeletion = testCacheFolder + "/testFolderForDeletion";
-        assertTrue(Filesystem.instance().createFolder(testFolderForDeletion));
+        assertTrue(FileSystem.instance().createFolder(testFolderForDeletion));
 
         var testFileURLForDeletion1 = testFolderForDeletion + "/TestFileForDeletion1.txt";
-        Filesystem.instance().createFile(testFileURLForDeletion1);
+        FileSystem.instance().createFile(testFileURLForDeletion1);
         var testFileURLForDeletion2 = testFolderForDeletion + "/TestFileForDeletion2.txt";
-        Filesystem.instance().createFile(testFileURLForDeletion2);
+        FileSystem.instance().createFile(testFileURLForDeletion2);
 
         /// SINGLE FILE
-        assertTrue(Filesystem.instance().urlExists(testFileURLForDeletion1));
-        Filesystem.instance().deleteFile(testFileURLForDeletion1);
-        assertTrue(!Filesystem.instance().urlExists(testFileURLForDeletion1));
+        assertTrue(FileSystem.instance().urlExists(testFileURLForDeletion1));
+        FileSystem.instance().deleteFile(testFileURLForDeletion1);
+        assertTrue(!FileSystem.instance().urlExists(testFileURLForDeletion1));
 
         /// FILE IN FOLDER AND FOLDER
-        assertTrue(Filesystem.instance().urlExists(testFileURLForDeletion2));
-        assertTrue(Filesystem.instance().urlExists(testFolderForDeletion));
-        Filesystem.instance().deleteFolder(testFolderForDeletion);
-        assertTrue(!Filesystem.instance().urlExists(testFileURLForDeletion2));
-        assertTrue(!Filesystem.instance().urlExists(testFolderForDeletion));
+        assertTrue(FileSystem.instance().urlExists(testFileURLForDeletion2));
+        assertTrue(FileSystem.instance().urlExists(testFolderForDeletion));
+        FileSystem.instance().deleteFolder(testFolderForDeletion);
+        assertTrue(!FileSystem.instance().urlExists(testFileURLForDeletion2));
+        assertTrue(!FileSystem.instance().urlExists(testFolderForDeletion));
     }
 
 
     public function testReadWeirdCharacterFileFromStatic()
     {
-        var testFileURL = Filesystem.instance().urlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
+        var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
 
-        var fileRead = Filesystem.instance().getFileReader(testFileURL);
+        var fileRead = FileSystem.instance().getFileReader(testFileURL);
         
         assertTrue(fileRead != null);
         
@@ -246,16 +249,16 @@ class FilesystemTest extends haxe.unit.TestCase {
     {
         var testFileURL = testCacheFolder + "/TestFileBadCharacters +~@.txt".urlEncode();
 
-        Filesystem.instance().createFile(testFileURL);
+        FileSystem.instance().createFile(testFileURL);
 
         var testFileText = "Test File Text!";
         var inputData : Data = new Data(testFileText.length);
         inputData.writeString(testFileText);
 
-        var fileWrite = Filesystem.instance().getFileWriter(testFileURL);
+        var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
 
-        var fileRead = Filesystem.instance().getFileReader(testFileURL);
+        var fileRead = FileSystem.instance().getFileReader(testFileURL);
 
         var prevSeek = fileRead.seekPosition;
         fileRead.seekEndOfFile();

@@ -1,7 +1,7 @@
 package filesystem;
 import cpp.Lib;
 
-class Filesystem
+class FileSystem
 {
 	private var filesystem_ios_init = Lib.load ("filesystems_ios", "filesystem_ios_init", 0);
 	private var filesystem_ios_get_url_to_static_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_static_data", 0);
@@ -102,14 +102,19 @@ class Filesystem
 	}
 
 	/// SINGLETON
-	static var fileSystemInstance : Filesystem;
-	static public inline function instance() : Filesystem
+	static var fileSystemInstance : FileSystem;
+	static public inline function instance() : FileSystem
+	{
+		return fileSystemInstance;
+	}
+	public static function initialize(finishedCallback : Void->Void) : Void
 	{
 		if(fileSystemInstance == null)
 		{
-			fileSystemInstance = new Filesystem();
+			fileSystemInstance = new FileSystem();
 		}
-		return fileSystemInstance;
+
+		finishedCallback();
 	}
 }
 

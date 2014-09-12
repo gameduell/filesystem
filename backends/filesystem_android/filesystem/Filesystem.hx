@@ -6,7 +6,7 @@ import hxjni.JNI;
 
 using StringTools;
 
-class Filesystem
+class FileSystem
 {
 
 	private var filesystem_android_init = Lib.load ("filesystem_android", "filesystem_android_init", 0);

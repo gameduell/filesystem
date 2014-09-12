@@ -1,16 +1,15 @@
 import FilesystemTest;
-
+import filesystem.FileSystem;
 class MainTester
 {
 	public function new() {};
 
 	static public function main() : Void 
 	{
-		var r = new haxe.unit.TestRunner();
-		r.add(new FilesystemTest());
-
-		r.run();
-
-		trace(r.result.toString());
+		FileSystem.initialize(function() : Void{
+			var r = new haxe.unit.TestRunner();
+			r.add(new FileSystemTest());
+			r.run();
+		});
 	}
 }

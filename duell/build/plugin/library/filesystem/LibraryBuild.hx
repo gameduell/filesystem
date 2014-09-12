@@ -78,6 +78,7 @@ class LibraryBuild
 	
 	public function preBuild() : Void
 	{
+
 		copyAssetListHaxeFile();
 
 		preBuildPerPlatform();
@@ -114,14 +115,6 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-        var libPath : String = DuellLib.getDuellLib("filesystem").getPath();
-
-        var exportPath : String = Path.join([Configuration.getData().OUTPUT,"haxe","filesystem"]);
-
-        var classSourcePath : String = Path.join([libPath,"template","filesystem"]);
-
-        TemplateHelper.recursiveCopyTemplatedFiles(classSourcePath, exportPath, Configuration.getData(), Configuration.getData().TEMPLATE_FUNCTIONS);
-
 		var targetDirectory = Configuration.getData().OUTPUT + "/" + "ios";
 		var projectDirectory = targetDirectory + "/" + Configuration.getData().APP.FILE + "/";
         for (file in fileListToCopy)
@@ -163,7 +156,13 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-
+		var targetDirectory = Configuration.getData().OUTPUT + "/" + "html5/web";
+        for (file in fileListToCopy)
+        {
+        	var targetFolder = Path.join([targetDirectory, "assets", Path.directory(file.relativeFilePath)]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, "assets", file.relativeFilePath]));
+        }
 	}
 
 	private function postBuildPerPlatform()
@@ -180,7 +179,13 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-
+		var targetDirectory = Configuration.getData().OUTPUT + "/" + "flash/web";
+        for (file in fileListToCopy)
+        {
+        	var targetFolder = Path.join([targetDirectory, "assets", Path.directory(file.relativeFilePath)]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, "assets", file.relativeFilePath]));
+        }
 	}
 
 	private function postBuildPerPlatform()

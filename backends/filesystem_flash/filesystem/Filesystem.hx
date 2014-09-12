@@ -1,11 +1,18 @@
 package filesystem;
-import platform.Platform;
 
 import types.Data;
 
+import flash.net.URLLoader;
+import flash.net.URLRequest;
+import flash.net.URLLoaderDataFormat;
+import flash.system.LoaderContext;
+
+import flash.events.*;
+import flash.utils.ByteArray;
+
 using StringTools;
 
-class Filesystem
+class FileSystem
 {
 
     public var staticData : Map<String, Data>;
@@ -13,10 +20,9 @@ class Filesystem
     public var tempData : Map<String, Data>;
     private function new() : Void
     {
-        staticData = Platform.instance().staticAssetData;
         cachedData = new Map<String, Data>();
         tempData = new Map<String, Data>();
-
+        staticData = new Map<String, Data>();
     }
 
     public function getFileList(url : String, ?recursive : Bool = true) : Array<String>
@@ -215,14 +221,61 @@ class Filesystem
 
 /// SINGLETON
 
-    static var fileSystemInstance : Filesystem;
-    static public inline function instance() : Filesystem
+    static var fileSystemInstance : FileSystem;
+    static public inline function instance() : FileSystem
+    {
+        return fileSystemInstance;
+    }
+
+    public static function initialize(finishedCallback : Void -> Void):Void
     {
         if(fileSystemInstance == null)
         {
-            fileSystemInstance = new Filesystem();
+            fileSystemInstance = new FileSystem();
         }
-        return fileSystemInstance;
+        preloadStaticAssets(finishedCallback);
+    }
+    static private var requestsLeft : Int;
+    public static function preloadStaticAssets(complete : Void -> Void) : Void
+    {
+        if(filesystem.StaticAssetList.list.length == 0)
+        {
+            complete();
+            return;
+        }
+        function encodeURLElement(element:String) : String
+        {
+            return element.urlEncode();
+        }
+        requestsLeft = filesystem.StaticAssetList.list.length;
+
+        for(val in filesystem.StaticAssetList.list)
+        {
+            var valWithAssets = "assets/"+val;
+            valWithAssets.split("/").map(encodeURLElement).join("/");
+            var loader:URLLoader = new URLLoader();
+            loader.dataFormat = URLLoaderDataFormat.BINARY;
+            var loaderContext:LoaderContext = new LoaderContext();
+
+            loader.addEventListener(Event.COMPLETE, function(event:Event):Void{
+                var bytes:ByteArray = event.target.data;
+                var data = new Data(0);
+                data.byteArray = bytes;
+
+               FileSystem.instance().staticData[val.urlEncode()] = data;
+                requestsLeft--;
+                if(requestsLeft == 0)
+                {
+                    complete();
+                }
+            });
+
+            loader.addEventListener(IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void{
+                trace(event);
+            });
+
+            loader.load(new URLRequest(valWithAssets));
+        }
     }
 
 /// HELPERS

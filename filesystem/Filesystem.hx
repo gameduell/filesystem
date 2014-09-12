@@ -1,10 +1,10 @@
 package filesystem;
 
-extern class Filesystem
+extern class FileSystem
 {
 	private function new() : Void;
-
-	public static function instance() : Filesystem;
+	public static function initialize(finishedCallback : Void->Void ):Void;
+	public static function instance() : FileSystem;
 
 	public function urlToStaticData() : String;
 	public function urlToCachedData() : String;

@@ -1,12 +1,12 @@
 package filesystem;
 
-import platform.Platform;
-
 import types.Data;
 
 using StringTools;
 
-class Filesystem
+import js.html.XMLHttpRequest;
+
+class FileSystem
 {
 
 	public var staticData : Map<String, Data>;
@@ -14,12 +14,10 @@ class Filesystem
 	public var tempData : Map<String, Data>;
 	private function new() : Void
 	{
-		Platform.initialize();
 
-		staticData = Platform.instance().staticAssetData;
-		
-		cachedData = new Map<String, Data>();
-		tempData = new Map<String, Data>();
+		staticData = new Map();
+		cachedData = new Map();
+		tempData = new Map();
 
 	}
 
@@ -219,15 +217,66 @@ class Filesystem
 	}
 
 	/// SINGLETON
+    static var fileSystemInstance : FileSystem;
+    static public inline function instance() : FileSystem
+    {
+        return fileSystemInstance;
+    }
 
-	static var fileSystemInstance : Filesystem;
-	static public inline function instance() : Filesystem
+    public static function initialize(finishedCallback : Void -> Void):Void
+    {
+
+        if(fileSystemInstance == null)
+        {
+            fileSystemInstance = new FileSystem();
+        }
+        preloadStaticAssets(finishedCallback);
+    }
+
+	static private var requestsLeft : Int;
+	public static function preloadStaticAssets(complete : Void -> Void) : Void
 	{
-		if(fileSystemInstance == null)
+		if(filesystem.StaticAssetList.list.length == 0)
 		{
-			fileSystemInstance = new Filesystem();
+			complete();
+			return;
 		}
-		return fileSystemInstance;
+
+		requestsLeft = 0;
+
+
+        function encodeURLElement(element:String) : String
+        {
+            return element.urlEncode();
+        }
+
+		for(val in filesystem.StaticAssetList.list)
+		{
+			requestsLeft += 1;
+			var valWithAssets = "assets/"+val;
+            valWithAssets.split("/").map(encodeURLElement).join("/");
+
+			var oReq = new XMLHttpRequest();
+			oReq.open("GET", valWithAssets, true);
+			oReq.responseType = "arraybuffer";
+
+			oReq.onload = function (oEvent) 
+			{
+				requestsLeft -= 1;
+	  			var arrayBuffer = oReq.response;
+	  			var data = new Data(0);
+	  			data.arrayBuffer = arrayBuffer;
+
+	  			FileSystem.instance().staticData[val.urlEncode()] = data;
+
+	  			if(requestsLeft == 0)
+	  			{
+	  				complete();
+	  			}
+			};
+
+			oReq.send(null);
+		}
 	}
 
 	/// HELPERS
