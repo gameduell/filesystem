@@ -2,7 +2,7 @@
 <library>
 
 	<haxelib name="types" />
-	<haxelib name="hxjni" />
+	<!-- <haxelib name="hxjni" /> -->
 
 	<ndll name="filesystem_android" />
 

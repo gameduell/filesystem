@@ -5,7 +5,7 @@ import types.Data;
 
 using StringTools;
 
-class Filesystem
+class FileSystem
 {
 
     private function new() : Void
