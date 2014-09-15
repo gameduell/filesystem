@@ -7,24 +7,7 @@
 package duell.build.plugin.library.filesystem;
 
 import duell.build.plugin.library.filesystem.LibraryConfiguration;
-
 import duell.build.plugin.platform.PlatformConfiguration;
-
-/*
-import duell.build.objects.DuellProjectXML;
-import duell.build.objects.Configuration;
-import duell.build.helpers.TemplateHelper;
-import duell.build.helpers.XCodeHelper;
-
-import duell.helpers.LogHelper;
-import duell.helpers.ProcessHelper;
-
-import duell.objects.DuellLib;
-import duell.objects.Haxelib;
-
-import sys.FileSystem;
-import haxe.io.Path;
-*/
 import duell.build.objects.Configuration;
 
 import duell.objects.DuellLib;
