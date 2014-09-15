@@ -20,15 +20,6 @@ class FileSystemTest extends haxe.unit.TestCase {
         var cachedData = FileSystem.instance().urlToCachedData();
         var tempData = FileSystem.instance().urlToTempData();
 
-        trace("FileSystemURLs");
-        trace("static url:" + staticURL);
-        trace("cached url:" + cachedData);
-        trace("temp url:" + tempData);
-
-        #if html5
-        trace("asset list: " + FileSystem.instance().getFileList(staticURL));
-        #end
-
         var testFolder = ("/testFolder " + Date.now().getTime()).urlEncode();
         testCacheFolder = FileSystem.instance().urlToCachedData() + testFolder;
         testTempFolder = FileSystem.instance().urlToTempData() + testFolder;

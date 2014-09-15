@@ -21,6 +21,7 @@ import haxe.io.Path;
 
 class LibraryBuild
 {
+	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 	private var fileListToCopy : Array<{fullPath : String, relativeFilePath : String}> = [];
     public function new ()
     {
@@ -90,25 +91,25 @@ class LibraryBuild
 		/// ADD ASSET FOLDER TO THE XCODE
 		var assetFolderID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
 		var fileID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
-		PlatformConfiguration.getData().ADDL_PBX_BUILD_FILE.push("      " + assetFolderID + " /* assets in Resources */ = {isa = PBXBuildFile; fileRef = " + fileID + " /* assets */; };");
-		PlatformConfiguration.getData().ADDL_PBX_FILE_REFERENCE.push("      " + fileID + " /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = " + Configuration.getData().APP.FILE + "/assets; sourceTree = \"<group>\"; };");
-		PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push("            " + fileID + " /* assets */,");			
-		PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push("            " + assetFolderID + " /* assets in Resources */,");
+		PlatformConfiguration.getData().ADDL_PBX_BUILD_FILE.push('      ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */ = {isa = PBXBuildFile; fileRef = ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */; };');
+		PlatformConfiguration.getData().ADDL_PBX_FILE_REFERENCE.push('      ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */ = {isa = PBXFileReference; lastKnownFileType = folder; name = $INTERNAL_ASSET_FOLDER; path = ' + Configuration.getData().APP.FILE + '/$INTERNAL_ASSET_FOLDER; sourceTree = \"<group>\"; };');
+		PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push('            ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */,');			
+		PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push('            ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */,');
 	}
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Configuration.getData().OUTPUT + "/" + "ios";
-		var projectDirectory = targetDirectory + "/" + Configuration.getData().APP.FILE + "/";
+		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "ios"]);
+		var projectDirectory = haxe.io.Path.join([targetDirectory, Configuration.getData().APP.FILE]);
 
-		var targetFolder = Path.join([projectDirectory, "assets"]);
+		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
 		PathHelper.mkdir(targetFolder);
 
         for (file in fileListToCopy)
         {
-        	var targetFolder = Path.join([projectDirectory, "assets", Path.directory(file.relativeFilePath)]);
+        	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(file.fullPath, Path.join([projectDirectory, "assets", file.relativeFilePath]));
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
         }
 	}
 
@@ -143,12 +144,12 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Configuration.getData().OUTPUT + "/" + "html5/web";
+		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
         for (file in fileListToCopy)
         {
-        	var targetFolder = Path.join([targetDirectory, "assets", Path.directory(file.relativeFilePath)]);
+        	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, "assets", file.relativeFilePath]));
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
         }
 	}
 
@@ -166,12 +167,12 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Configuration.getData().OUTPUT + "/" + "flash/web";
+		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
         for (file in fileListToCopy)
         {
-        	var targetFolder = Path.join([targetDirectory, "assets", Path.directory(file.relativeFilePath)]);
+        	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, "assets", file.relativeFilePath]));
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
         }
 	}
 
