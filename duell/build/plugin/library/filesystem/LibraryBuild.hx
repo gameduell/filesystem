@@ -118,6 +118,23 @@ class LibraryBuild
 
 	}
 
+    #elseif platform_macane
+
+	private function postParsePerPlatform()
+	{
+
+	}
+
+	private function preBuildPerPlatform()
+	{
+
+	}
+
+	private function postBuildPerPlatform()
+	{
+
+	}
+
 	#elseif platform_android
 
 	private function postParsePerPlatform()
