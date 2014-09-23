@@ -62,7 +62,6 @@ class LibraryBuild
 	
 	public function preBuild() : Void
 	{
-
 		copyAssetListHaxeFile();
 
 		preBuildPerPlatform();
@@ -99,8 +98,8 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "ios"]);
-		var projectDirectory = haxe.io.Path.join([targetDirectory, Configuration.getData().APP.FILE]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "ios"]);
+		var projectDirectory = Path.join([targetDirectory, Configuration.getData().APP.FILE]);
 
 		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
 		PathHelper.mkdir(targetFolder);
@@ -122,12 +121,19 @@ class LibraryBuild
 
 	private function postParsePerPlatform()
 	{
-		
 	}
 
 	private function preBuildPerPlatform()
 	{
 
+		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
+        for (file in fileListToCopy)
+        {
+        	var targetFolder = Path.join([targetDirectory, Path.directory(file.relativeFilePath)]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, file.relativeFilePath]));
+        }
 	}
 
 	private function postBuildPerPlatform()
@@ -144,7 +150,7 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
@@ -167,7 +173,7 @@ class LibraryBuild
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = haxe.io.Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);

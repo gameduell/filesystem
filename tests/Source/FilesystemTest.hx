@@ -26,8 +26,9 @@ class FileSystemTest extends haxe.unit.TestCase {
 
         FileSystem.instance().createFolder(testCacheFolder);
         FileSystem.instance().createFolder(testTempFolder);
+
     }
-    
+
     public function testURLs()
     {
         var staticURL = FileSystem.instance().urlToStaticData();
@@ -44,7 +45,6 @@ class FileSystemTest extends haxe.unit.TestCase {
 
     public function testCreation()
     {
-
         /// CACHED
         var urlCachedFile = testCacheFolder + "/test.txt";
         FileSystem.instance().createFile(urlCachedFile);
@@ -67,7 +67,6 @@ class FileSystemTest extends haxe.unit.TestCase {
         fileRead.close();
         fileWrite.close();
     }
-
     public function testStaticAssetList()
     {
         var expectedList = [
@@ -116,7 +115,6 @@ class FileSystemTest extends haxe.unit.TestCase {
         fileRead.close();
     }
     
-
     public function testWrite()
     {
         var testFileURL = testCacheFolder + "/TestFile.txt";
@@ -151,8 +149,8 @@ class FileSystemTest extends haxe.unit.TestCase {
 
         fileRead.close();
         fileWrite.close();
-    }
 
+    }
 
     public function testExistence()
     {
@@ -270,5 +268,6 @@ class FileSystemTest extends haxe.unit.TestCase {
         fileRead.close();
         fileWrite.close();
     }
+    
     
 }

@@ -29,7 +29,7 @@
 static AAssetManager *nativeAssetManager = 0;
 
 extern "C" JAVA_EXPORT void JNICALL
-Java_org_haxe_hxfilesystem_NativeInterface_setupNativeAssetManager(JNIEnv * env, jclass cls, jobject assetManager) {
+Java_org_haxe_duell_filesystem_DuellFileSystemNativeInterface_setupNativeAssetManager(JNIEnv * env, jclass cls, jobject assetManager) {
 
     nativeAssetManager = AAssetManager_fromJava(env, assetManager);
 }

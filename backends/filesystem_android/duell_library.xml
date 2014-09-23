@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library>
 
-	<haxelib name="types" />
-	<!-- <haxelib name="hxjni" /> -->
+	<duelllib name="hxjni" /> 
 
-	<ndll name="filesystem_android" />
+	<ndll name="filesystemandroid" build-file-path="project/Build.xml" bin-path="ndll" />
 
-	<dependency name="hxfilesystem" path="dependencies/android" if="android" />
+    <platform-config>
+    	<android>
+    		<java-source name="DuellFileSystemActivityExtension" path="java" />
+    		<activity-extension name="org.haxe.duell.filesystem.DuellFileSystemActivityExtension" />
+		</android>
+	</platform-config>
+
+	<!-- <dependency name="hxfilesystem" path="dependencies/android" if="android" /> -->
 
 </library>

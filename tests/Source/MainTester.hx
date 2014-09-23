@@ -10,6 +10,7 @@ class MainTester
 			var r = new haxe.unit.TestRunner();
 			r.add(new FileSystemTest());
 			r.run();
+			trace(r.result);
 		});
 	}
 }
