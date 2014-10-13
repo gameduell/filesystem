@@ -9,7 +9,7 @@ using StringTools;
 
 import Date;
 
-class FileSystemTest extends haxe.unit.TestCase {
+class FileSystemTest extends unittest.TestCase {
     
 
     public function new ()

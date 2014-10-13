@@ -3,7 +3,7 @@
 	
 	<app title="Filesystem Testing" 
 		 file="filesystemtests" 
-		 package="com.gameduell.filesystemtesting" 
+		 package="com.haxe.duell.filesystemtesting" 
 		 version="0.0.1" 
 		 company="GameDuell GmbH" />
 
@@ -11,6 +11,8 @@
 
 	<source path="Source" />
 
+	<duelllib name="duellkit" />
+	<duelllib name="unittest" />
 	<duelllib name="filesystem" />
 
 	<library-config>

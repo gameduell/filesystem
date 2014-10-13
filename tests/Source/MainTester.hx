@@ -1,16 +1,38 @@
+import unittest.implementations.TestHTTPLogger;
+import unittest.implementations.TestJUnitLogger;
+import unittest.implementations.TestSimpleLogger;
+
+import unittest.TestRunner;
+
 import FilesystemTest;
-import filesystem.FileSystem;
+
+import duell.DuellKit;
+
 class MainTester
 {
-	public function new() {};
+    private static var r : TestRunner;
+    static function main()
+    {
+        DuellKit.initialize(start);
+    }
 
-	static public function main() : Void 
-	{
-		FileSystem.initialize(function() : Void{
-			var r = new haxe.unit.TestRunner();
-			r.add(new FileSystemTest());
-			r.run();
-			trace(r.result);
-		});
-	}
+    static function start() : Void
+    {
+        r = new TestRunner(testComplete);
+		r.add(new FileSystemTest());
+
+        #if test
+        r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
+        #else
+        r.addLogger(new TestSimpleLogger());
+        #end
+
+        r.run();
+    }
+
+    static function testComplete()
+    {
+        trace(r.result);
+    }
+
 }
