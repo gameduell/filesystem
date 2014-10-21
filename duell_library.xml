@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library>
 
-	<duelllib name="types" />
+	<duelllib name="types" version="1.*.*" />
 
     <include path="backends/filesystem_html5/duell_library.xml" if="html5" />
     <include path="backends/filesystem_android/duell_library.xml" if="android" />
