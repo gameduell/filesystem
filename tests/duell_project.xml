@@ -11,9 +11,9 @@
 
 	<source path="Source" />
 
-	<duelllib name="duellkit" />
-	<duelllib name="unittest" />
-	<duelllib name="filesystem" />
+	<duelllib name="duellkit" version="1.*.*" />
+	<duelllib name="unittest" version="1.*.*"/>
+	<duelllib name="filesystem"  version="1.*.*"/>
 
 	<library-config>
 		<filesystem>
