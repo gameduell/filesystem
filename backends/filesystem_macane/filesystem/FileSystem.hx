@@ -89,12 +89,12 @@ class FileSystem
 
 /// SINGLETON
 
-    static var fileSystemInstance : Filesystem;
-    static public inline function instance() : Filesystem
+    static var fileSystemInstance : FileSystem;
+    static public inline function instance() : FileSystem
     {
         if(fileSystemInstance == null)
         {
-            fileSystemInstance = new Filesystem();
+            fileSystemInstance = new FileSystem();
         }
         return fileSystemInstance;
     }
