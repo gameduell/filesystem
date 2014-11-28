@@ -262,7 +262,10 @@ class FileSystem
                 var data = new Data(0);
                 data.byteArray = bytes;
 
-               FileSystem.instance().staticData[val.urlEncode()] = data;
+                var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
+
+                FileSystem.instance().staticData[correctedUrl] = data;
+
                 requestsLeft--;
                 if(requestsLeft == 0)
                 {
