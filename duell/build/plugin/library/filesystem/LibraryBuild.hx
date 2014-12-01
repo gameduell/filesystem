@@ -204,5 +204,23 @@ class LibraryBuild
 
 	}
 
+	#else
+
+	private function postParsePerPlatform()
+	{
+		
+	}
+
+	private function preBuildPerPlatform()
+	{
+		
+	}
+
+	private function postBuildPerPlatform()
+	{
+
+	}
+
+
 	#end
 }
