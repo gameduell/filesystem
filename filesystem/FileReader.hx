@@ -9,9 +9,9 @@ extern class FileReader
 
 	public var seekPosition (get, set) : Int;
 
-	public function seekEndOfFile();
+	public function seekEndOfFile(): Void;
 
-	public function readIntoData(outputData : Data);
+	public function readIntoData(outputData : Data): Void;
 
-	public function close();
+	public function close(): Void;
 }
