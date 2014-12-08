@@ -21,12 +21,6 @@ class FileWriter
 		return filesystem_android_set_seek(nativeFileHandle, val);
 	}
 
-	private var filesystem_android_seek_end_of_file = Lib.load ("filesystemandroid", "filesystem_android_seek_end_of_file", 1);
-	public function seekEndOfFile()
-	{
-		return filesystem_android_seek_end_of_file(nativeFileHandle);
-	}
-
 	/// the filesystem creates files
 	public function new(nativeFileHandle : Dynamic) : Void 
 	{

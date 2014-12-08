@@ -101,6 +101,22 @@ class FileSystem
 		return filesystem_ios_is_file(url);
 	}
 
+	private var filesystem_ios_seek_end_of_file = Lib.load ("filesystem_ios", "filesystem_ios_seek_end_of_file", 1);
+	private var filesystem_ios_get_seek = Lib.load ("filesystem_ios", "filesystem_ios_get_seek", 1);
+	private var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);
+	public function getFileSize(url : String) : Int
+	{
+		var nativeHandle = filesystem_ios_open_file_read(url);
+		if(nativeHandle == null)
+			return 0;
+
+		filesystem_ios_seek_end_of_file(nativeHandle);
+		var newSeek = filesystem_ios_get_seek(nativeHandle);
+		filesystem_ios_file_close(nativeHandle);
+
+		return newSeek;
+	}
+
 	/// SINGLETON
 	static var fileSystemInstance : FileSystem;
 	static public inline function instance() : FileSystem

@@ -26,11 +26,6 @@ class FileReader
 		return currentSeekPosition;
 	}
 
-	public function seekEndOfFile()
-	{
-		currentSeekPosition = fileData.allocedLength;
-	}
-
 	public function readIntoData(data : Data)
 	{
 		fileData.offset = currentSeekPosition;

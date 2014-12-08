@@ -26,11 +26,6 @@ class FileWriter
 		return currentSeekPosition;
 	}
 
-	public function seekEndOfFile()
-	{
-		currentSeekPosition = fileData.allocedLength;
-	}
-
 	public function writeFromData(data : Data)
 	{
 		if(fileData.allocedLength < currentSeekPosition + data.offsetLength)

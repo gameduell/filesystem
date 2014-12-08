@@ -219,6 +219,21 @@ class FileSystem
         return map.exists(withoutPrefix) && map[withoutPrefix] != null;
     }
 
+    public function getFileSize(url : String) : Int
+    {
+        var map = getDataDictionaryBasedOnPrefix(url);
+
+        if(map == null)
+            return 0;
+
+        var withoutPrefix = trimURLPrefix(url);
+
+        if (!map.exists(withoutPrefix))
+            return 0;
+
+        return map[withoutPrefix].offsetLength;
+    }
+
 /// SINGLETON
 
     static var fileSystemInstance : FileSystem;

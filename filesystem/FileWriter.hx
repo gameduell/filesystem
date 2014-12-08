@@ -9,8 +9,6 @@ extern class FileWriter
 
 	public var seekPosition (get, set) : Int;
 
-	public function seekEndOfFile(): Void;
-
 	public function writeFromData(data : Data): Void;
 
 	public function close(): Void;

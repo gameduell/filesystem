@@ -119,6 +119,24 @@ class FileSystem
 		return filesystem_android_is_file(path);
 	}
 
+	private var filesystem_android_seek_end_of_file = Lib.load ("filesystemandroid", "filesystem_android_seek_end_of_file", 1);
+	private var filesystem_android_get_seek = Lib.load ("filesystemandroid", "filesystem_android_get_seek", 1);
+	private var filesystem_android_file_close = Lib.load ("filesystemandroid", "filesystem_android_file_close", 1);
+	public function getFileSize(url : String) : Int
+	{
+		var path = url.urlDecode();
+		var nativeHandle = filesystem_android_open_file_read(path);
+		if(nativeHandle == null)
+			return 0;
+
+		var prevSeek = filesystem_android_get_seek(nativeHandle);
+		filesystem_android_seek_end_of_file(nativeHandle);
+		var newSeek = filesystem_android_get_seek(nativeHandle);
+		filesystem_android_file_close(nativeHandle);
+
+		return newSeek - prevSeek;
+	}
+
 	/// SINGLETON
     static var fileSystemInstance : FileSystem;
     static public inline function instance() : FileSystem

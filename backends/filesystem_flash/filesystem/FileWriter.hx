@@ -26,11 +26,6 @@ class FileWriter
         return currentSeekPosition;
     }
 
-    public function seekEndOfFile() :Void
-    {
-        currentSeekPosition = fileData.offsetLength;
-    }
-
     public function writeFromData(data : Data) :Void
     {
         if(fileData.allocedLength < currentSeekPosition + data.offsetLength)

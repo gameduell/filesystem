@@ -19,6 +19,8 @@ extern class FileSystem
 	public function isFolder(url : String) : Bool;
 	public function isFile(url : String) : Bool;
 
+	public function getFileSize() : Int;
+
 	public function deleteFile(url : String) : Void;
 	public function deleteFolder(url : String) : Void;
 }

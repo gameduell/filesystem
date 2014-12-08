@@ -63,7 +63,6 @@ class FileSystemTest extends unittest.TestCase {
         var fileRead = FileSystem.instance().getFileReader(urlTempFile);
         assertTrue(fileRead != null);
 
-
         fileRead.close();
         fileWrite.close();
     }
@@ -90,14 +89,9 @@ class FileSystemTest extends unittest.TestCase {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.txt";
 
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
-
-        
         assertTrue(fileRead != null);
-        var prevSeek = fileRead.seekPosition;
-        fileRead.seekEndOfFile();
-        var endSeek = fileRead.seekPosition;
-        var fileSize = endSeek - prevSeek;
-        fileRead.seekPosition = prevSeek;
+
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
 
         var data = new Data(fileSize);
 
@@ -106,7 +100,6 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(str != "This is a test file!");
 
         fileRead.readIntoData(data);
-
 
         str = data.readString();
 
@@ -119,7 +112,8 @@ class FileSystemTest extends unittest.TestCase {
     {
         var testFileURL = testCacheFolder + "/TestFile.txt";
 
-        FileSystem.instance().createFile(testFileURL);
+        FileSystem.instance().deleteFile(testFileURL);
+        assertTrue(FileSystem.instance().createFile(testFileURL));
 
         /// WRITE
         var testFileText = "Test File Text!";
@@ -127,17 +121,13 @@ class FileSystemTest extends unittest.TestCase {
         inputData.writeString(testFileText);
         var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
+        fileWrite.close();
 
         /// READ
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
 
-        var prevSeek = fileRead.seekPosition;
-        fileRead.seekEndOfFile();
-        var endSeek = fileRead.seekPosition;
-        var fileSize = endSeek - prevSeek;
-
-        fileRead.seekPosition = prevSeek;
-
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
+        assertEquals(testFileText.length, fileSize);
         var outputData = new Data(fileSize);
 
         assertTrue(outputData.readString() != testFileText);
@@ -148,7 +138,6 @@ class FileSystemTest extends unittest.TestCase {
         assertEquals(testFileText, outputData.readString());
 
         fileRead.close();
-        fileWrite.close();
 
     }
 
@@ -208,27 +197,21 @@ class FileSystemTest extends unittest.TestCase {
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
 
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
+
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
         
         assertTrue(fileRead != null);
         
-        var prevSeek = fileRead.seekPosition;
-        fileRead.seekEndOfFile();
-        var endSeek = fileRead.seekPosition;
-        var fileSize = endSeek - prevSeek;
-        fileRead.seekPosition = prevSeek;
-
         var data = new Data(fileSize);
 
-        var str = data.readString();
-
-        assertTrue(str != "This is a test file!");
+        var str = "";
 
         fileRead.readIntoData(data);
 
         str = data.readString();
 
-        assertTrue(str == "This is a test file!");
+        assertEquals(str, "This is a test file!");
 
         fileRead.close();
     }
@@ -249,12 +232,7 @@ class FileSystemTest extends unittest.TestCase {
 
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
 
-        var prevSeek = fileRead.seekPosition;
-        fileRead.seekEndOfFile();
-        var endSeek = fileRead.seekPosition;
-        var fileSize = endSeek - prevSeek;
-
-        fileRead.seekPosition = prevSeek;
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
 
         var outputData = new Data(fileSize);
 

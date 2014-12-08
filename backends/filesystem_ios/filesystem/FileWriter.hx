@@ -21,12 +21,6 @@ class FileWriter
 		return filesystem_ios_set_seek(nativeFileHandle, val);
 	}
 
-	private var filesystem_ios_seek_end_of_file = Lib.load ("filesystem_ios", "filesystem_ios_seek_end_of_file", 1);
-	public function seekEndOfFile()
-	{
-		return filesystem_ios_seek_end_of_file(nativeFileHandle);
-	}
-
 	/// the filesystem creates files
 	public function new(nativeFileHandle : Dynamic) : Void 
 	{

@@ -13,7 +13,7 @@
 
 	<duelllib name="duellkit" version="1.*.*" />
 	<duelllib name="unittest" version="1.*.*"/>
-	<duelllib name="filesystem"  version="1.*.*"/>
+	<duelllib name="filesystem"  version="master"/>
 
 	<library-config>
 		<filesystem>
