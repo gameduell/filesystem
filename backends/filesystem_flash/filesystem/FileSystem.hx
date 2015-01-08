@@ -343,6 +343,25 @@ class FileSystem
         }
     }
 
+    public function getData(url:String): Data
+    {
+        var map = getDataDictionaryBasedOnPrefix(url);
+
+        if (map == null)
+        {
+            return null;
+        }
+
+        var withoutPrefix = trimURLPrefix(url);
+
+        if (!map.exists(withoutPrefix))
+        {
+            return null;
+        }
+
+        return map[withoutPrefix];
+    }
+
     /// HELPERS
 
     /**
