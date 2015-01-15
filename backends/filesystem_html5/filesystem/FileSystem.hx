@@ -268,7 +268,7 @@ class FileSystem
 		for(val in filesystem.StaticAssetList.list)
 		{
 			requestsLeft += 1;
-			var valWithAssets = "assets/"+val;
+			var valWithAssets = getBaseURL()+"assets/"+val;
             valWithAssets.split("/").map(encodeURLElement).join("/");
 
 			var oReq = new XMLHttpRequest();
@@ -295,7 +295,16 @@ class FileSystem
 			oReq.send(null);
 		}
 	}
+	public static function getBaseURL() 
+	{
+			var location: js.html.Location =  js.Browser.location;
+		    var url = location.href;  // entire url including querystring - also: window.location.href;
+		    var baseURL = url.substring(0, url.indexOf('/', 14));
 
+	        // Root Url for domain name
+	        return baseURL + "/";
+		    
+	}
 	public function getData(url:String): Data
 	{
 		var map = getDataDictionaryBasedOnPrefix(url);
