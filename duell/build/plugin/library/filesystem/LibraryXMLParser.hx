@@ -30,15 +30,26 @@ class LibraryXMLParser
 			{
 				case 'static-assets':
 					parseStaticAssetsElement(element);
+
+				case 'exclude':
+					parseExcludeElement(element);
 			}
 		}
 	}
 
-	private static function parseStaticAssetsElement(element : Fast)
+	private static function parseStaticAssetsElement(element: Fast)
 	{
 		if (element.has.path)
 		{
 			LibraryConfiguration.getData().STATIC_ASSET_FOLDERS.push(resolvePath(element.att.path));
+		}
+	}
+
+	private static function parseExcludeElement(element: Fast)
+	{
+		if (element.has.path)
+		{
+			LibraryConfiguration.getData().EXCLUDE_ASSET_FILENAMES.push(resolvePath(element.att.path));
 		}
 	}
 

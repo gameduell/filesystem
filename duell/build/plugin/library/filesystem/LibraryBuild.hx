@@ -22,9 +22,12 @@ import haxe.io.Path;
 class LibraryBuild
 {
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
-	private var fileListToCopy : Array<{fullPath : String, relativeFilePath : String}> = [];
-    public function new ()
+
+	private var fileListToCopy: List<{fullPath : String, relativeFilePath : String}>;
+
+	public function new ()
     {
+		fileListToCopy = new List<{fullPath : String, relativeFilePath : String}>();
     }
 
 	public function postParse() : Void
@@ -62,9 +65,26 @@ class LibraryBuild
 	
 	public function preBuild() : Void
 	{
+		removeExcludedFiles();
+
 		copyAssetListHaxeFile();
 
 		preBuildPerPlatform();
+	}
+
+	private function removeExcludedFiles(): Void
+	{
+		for (excludedPath in LibraryConfiguration.getData().EXCLUDE_ASSET_FILENAMES)
+		{
+			for (pathObject in fileListToCopy)
+			{
+				if (pathObject.fullPath == excludedPath)
+				{
+					LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.remove(pathObject.relativeFilePath);
+					fileListToCopy.remove(pathObject);
+				}
+			}
+		}
 	}
 
 	private function copyAssetListHaxeFile() : Void
