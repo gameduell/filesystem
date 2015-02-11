@@ -17,6 +17,8 @@ import duell.helpers.PathHelper;
 
 import sys.io.Process;
 
+using StringTools;
+
 import haxe.io.Path;
 
 class LibraryBuild
@@ -76,15 +78,28 @@ class LibraryBuild
 	{
 		for (excludedPath in LibraryConfiguration.getData().EXCLUDE_ASSET_FILENAMES)
 		{
+			var regex: EReg = new EReg(regexifyPath(excludedPath), "i");
+
 			for (pathObject in fileListToCopy)
 			{
-				if (pathObject.fullPath == excludedPath)
+				if (regex.match(pathObject.fullPath))
 				{
 					LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.remove(pathObject.relativeFilePath);
 					fileListToCopy.remove(pathObject);
 				}
 			}
 		}
+	}
+
+	private static function regexifyPath(path: String): String
+	{
+		// dots in filenames have to be escaped, otherwise they mean "any character"
+		path = path.replace(".", "\\.");
+		// asterisk is a wildcard for everything that comes before
+		path = path.replace("*", ".*");
+
+		// assume everything which is leading the path as a match
+		return ".*" + path;
 	}
 
 	private function copyAssetListHaxeFile() : Void
