@@ -46,9 +46,18 @@ class LibraryBuild
 			Configuration.getData().SOURCES.push(haxeExtraSources);
 		}
 
+		postParsePerPlatform();
+	}
+
+	public function preBuild() : Void
+	{
 		determineFileListFromAssetFolders();
 
-		postParsePerPlatform();
+		removeExcludedFiles();
+
+		copyAssetListHaxeFile();
+
+		preBuildPerPlatform();
 	}
 
 	private function determineFileListFromAssetFolders() : Void
@@ -63,15 +72,6 @@ class LibraryBuild
 				LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 			}
 		}
-	}
-	
-	public function preBuild() : Void
-	{
-		removeExcludedFiles();
-
-		copyAssetListHaxeFile();
-
-		preBuildPerPlatform();
 	}
 
 	private function removeExcludedFiles(): Void
