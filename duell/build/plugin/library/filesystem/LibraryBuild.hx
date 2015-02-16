@@ -14,6 +14,8 @@ import duell.objects.DuellLib;
 import duell.helpers.TemplateHelper;
 import duell.helpers.FileHelper;
 import duell.helpers.PathHelper;
+import duell.helpers.LogHelper;
+
 
 import sys.io.Process;
 
@@ -45,14 +47,13 @@ class LibraryBuild
 		{
 			Configuration.getData().SOURCES.push(haxeExtraSources);
 		}
-
+		determineFileListFromAssetFolders();
 		postParsePerPlatform();
 	}
 
 	public function preBuild() : Void
 	{
-		determineFileListFromAssetFolders();
-
+		
 		removeExcludedFiles();
 
 		copyAssetListHaxeFile();
@@ -197,19 +198,25 @@ class LibraryBuild
 
 	private function postParsePerPlatform()
 	{
-		
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
+		var targetFolder: String  = "";
+		var fileDestinationFullPath: String = "";
+        for (file in fileListToCopy)
+        {
+        	targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
+			fileDestinationFullPath = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
+			
+			LogHelper.info('[FILESYSTEM] Embedding html5 asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	/// Add files as resources to haxe arguments
+        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        }
 	}
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
-        for (file in fileListToCopy)
-        {
-        	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
-        	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
-        }
-	}
+    }
 
 	private function postBuildPerPlatform()
 	{
@@ -220,18 +227,26 @@ class LibraryBuild
 
 	private function postParsePerPlatform()
 	{
-		
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
+		var targetFolder: String  = "";
+		var fileDestinationFullPath: String = "";
+
+        for (file in fileListToCopy)
+        {
+        	targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
+			fileDestinationFullPath = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
+			
+			LogHelper.info('[FILESYSTEM] Embedding flash asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	/// Add files as resources to haxe arguments
+        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        }
+
 	}
 
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
-        for (file in fileListToCopy)
-        {
-        	var targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
-        	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
-        }
 	}
 
 	private function postBuildPerPlatform()

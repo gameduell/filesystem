@@ -13,6 +13,7 @@ import flash.system.LoaderContext;
 import flash.utils.ByteArray;
 
 using StringTools;
+using types.haxeinterop.DataBytesTools;
 
 class FileSystem
 {
@@ -298,7 +299,7 @@ class FileSystem
 
     public static function preloadStaticAssets(complete: Void -> Void): Void
     {
-        if (filesystem.StaticAssetList.list.length == 0)
+        /*if (filesystem.StaticAssetList.list.length == 0)
         {
             complete();
             return;
@@ -340,7 +341,22 @@ class FileSystem
             });
             var req = new URLRequest(getBaseURL() + valWithAssets);
             loader.load(req);
+        }*/
+
+        if (filesystem.StaticAssetList.list.length == 0)
+        {
+            complete();
+            return;
         }
+        for(val in filesystem.StaticAssetList.list)
+        {
+            var haxeBytes = haxe.Resource.getBytes( val );
+            var data = haxeBytes.getTypesData();
+            var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
+            FileSystem.instance().staticData[correctedUrl] = data;
+            haxeBytes = null;
+        }
+        complete();        
     }
 
     public function getData(url:String): Data
