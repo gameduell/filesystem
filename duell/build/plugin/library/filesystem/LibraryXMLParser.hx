@@ -39,9 +39,12 @@ class LibraryXMLParser
 
 	private static function parseStaticAssetsElement(element: Fast)
 	{
+		var isEmbedded: Bool = false;
 		if (element.has.path)
 		{
-			LibraryConfiguration.getData().STATIC_ASSET_FOLDERS.push(resolvePath(element.att.path));
+			isEmbedded = element.has.embed && element.att.embed == "true";
+			LibraryConfiguration.getData().STATIC_ASSET_FOLDERS.push({path: resolvePath(element.att.path), embedded: isEmbedded});
+			isEmbedded = false;
 		}
 	}
 

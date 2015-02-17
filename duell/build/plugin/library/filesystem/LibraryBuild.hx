@@ -27,11 +27,10 @@ class LibraryBuild
 {
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 
-	private var fileListToCopy: List<{fullPath : String, relativeFilePath : String}>;
-
+	private var fileListToCopy: List<{fullPath : String, relativeFilePath : String, embedded: Bool}>;
 	public function new ()
     {
-		fileListToCopy = new List<{fullPath : String, relativeFilePath : String}>();
+		fileListToCopy = new List<{fullPath : String, relativeFilePath : String, embedded: Bool}>();
     }
 
 	public function postParse() : Void
@@ -67,11 +66,11 @@ class LibraryBuild
 	{
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
-			var files = duell.helpers.PathHelper.getRecursiveFileListUnderFolder(folder);
+			var files = duell.helpers.PathHelper.getRecursiveFileListUnderFolder(folder.path);
 
 			for (file in files)
 			{
-				fileListToCopy.push({fullPath : Path.join([folder, file]), relativeFilePath : file});
+				fileListToCopy.push({fullPath : Path.join([folder.path, file]), relativeFilePath : file, embedded: folder.embedded});
 				LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 			}
 		}
@@ -223,7 +222,10 @@ class LibraryBuild
 			
 			LogHelper.info('[FILESYSTEM] Embedding html5 asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
         	/// Add files as resources to haxe arguments
-        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	if(file.embedded)
+        	{
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	}
         }
 	}
 
@@ -256,7 +258,10 @@ class LibraryBuild
 			
 			LogHelper.info('[FILESYSTEM] Embedding flash asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
         	/// Add files as resources to haxe arguments
-        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	if(file.embedded)
+        	{
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	}
         }
 
 	}
