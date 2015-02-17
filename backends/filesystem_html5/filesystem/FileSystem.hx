@@ -251,73 +251,67 @@ class FileSystem
 	static private var requestsLeft : Int;
 	public static function preloadStaticAssets(complete : Void -> Void) : Void
 	{
-		
+		/*
+			if(filesystem.StaticAssetList.list.length == 0)
+			    {
+			      complete();
+			      return;
+			    }
+
+			    requestsLeft = 0;
+
+
+			        function encodeURLElement(element:String) : String
+			        {
+			            return element.urlEncode();
+			        }
+
+			    for(val in filesystem.StaticAssetList.list)
+			    {
+			      requestsLeft += 1;
+			      var valWithAssets = getBaseURL()+"assets/"+val;
+			            valWithAssets.split("/").map(encodeURLElement).join("/");
+
+			      var oReq = new XMLHttpRequest();
+			      oReq.open("GET", valWithAssets, true);
+			      oReq.responseType = "arraybuffer";
+
+			      oReq.onload = function (oEvent) 
+			      {
+			        requestsLeft -= 1;
+			          var arrayBuffer = oReq.response;
+			          var data = new Data(0);
+			          data.arrayBuffer = arrayBuffer;
+
+			        var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
+
+			          FileSystem.instance().staticData[correctedUrl] = data;
+
+			          if(requestsLeft == 0)
+			          {
+			            complete();
+			          }
+			      };
+
+			      oReq.send(null);
+			    }
+		*/
+
 		if(filesystem.StaticAssetList.list.length == 0)
 		{
-		  complete();
-		  return;
+			complete();
+			return;
 		}
-
-		requestsLeft = 0;
-
-	    function encodeURLElement(element:String) : String
-	    {
-	        return element.urlEncode();
-	    }
-
-	    function checkIfAvailableInResourcesAndAddtoFilesystem(fileName: String): Bool
-	    {
-	    	var haxeBytes = haxe.Resource.getBytes(fileName);
-			if(haxeBytes == null)
-			{
-				return false;
-			}
-			var data = haxeBytes.getTypesData();
-			var correctedUrl: String = fileName.split("/").map(StringTools.urlEncode).join("/");
-			FileSystem.instance().staticData[correctedUrl] = data;
-			haxeBytes = null;
-			return true;
-	    }
-
 		for(val in filesystem.StaticAssetList.list)
 		{
-		  if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
-		  {
-		  	if(requestsLeft == 0)
-		      {
-		        complete();
-		      }
-		  	continue;
-		  }
-		  requestsLeft += 1;
-		  var valWithAssets = getBaseURL()+"assets/"+val;
-		  valWithAssets.split("/").map(encodeURLElement).join("/");
-
-		  var oReq = new XMLHttpRequest();
-		  oReq.open("GET", valWithAssets, true);
-		  oReq.responseType = "arraybuffer";
-
-		  oReq.onload = function (oEvent) 
-		  {
-		    requestsLeft -= 1;
-		      var arrayBuffer = oReq.response;
-		      var data = new Data(0);
-		      data.arrayBuffer = arrayBuffer;
-
-		    var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
-
-		      FileSystem.instance().staticData[correctedUrl] = data;
-
-		      if(requestsLeft == 0)
-		      {
-		        complete();
-		      }
-		  };
-
-		  oReq.send(null);
+			var haxeBytes = haxe.Resource.getBytes( val );
+			var data = haxeBytes.getTypesData();
+			var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
+			FileSystem.instance().staticData[correctedUrl] = data;
+			haxeBytes = null;
 		}
+		complete();
 	}
-
 	public static function getBaseURL() 
 	{
 			var location: js.html.Location =  js.Browser.location;
