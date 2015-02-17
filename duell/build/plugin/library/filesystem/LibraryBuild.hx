@@ -50,12 +50,14 @@ class LibraryBuild
 		determineFileListFromAssetFolders();
 		postParsePerPlatform();
 	}
+	public function postPostParse(): Void
+	{
+		removeExcludedFiles();
+	    postPostParsePerPlatform();
+	}
 
 	public function preBuild() : Void
 	{
-		
-		removeExcludedFiles();
-
 		copyAssetListHaxeFile();
 
 		preBuildPerPlatform();
@@ -121,7 +123,7 @@ class LibraryBuild
 
 	#if platform_ios
 
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
 	{
 		/// ADD ASSET FOLDER TO THE XCODE
 		var assetFolderID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
@@ -132,6 +134,9 @@ class LibraryBuild
 		PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push('            ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */,');
 	}
 
+	private function postPostParsePerPlatform():Void
+	{
+	}
 	private function preBuildPerPlatform()
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "ios"]);
@@ -148,35 +153,41 @@ class LibraryBuild
         }
 	}
 
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
 
     #elseif platform_macane
 
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
+	{
+
+	}
+	private function postPostParsePerPlatform():Void
+	{
+	}
+
+	private function preBuildPerPlatform(): Void
 	{
 
 	}
 
-	private function preBuildPerPlatform()
-	{
-
-	}
-
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
 
 	#elseif platform_android
 
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
+	{
+	}
+	private function postPostParsePerPlatform():Void
 	{
 	}
 
-	private function preBuildPerPlatform()
+	private function preBuildPerPlatform(): Void
 	{
 
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
@@ -189,14 +200,16 @@ class LibraryBuild
         }
 	}
 
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
 
 	#elseif platform_html5
-
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
+	{
+	}
+	private function postPostParsePerPlatform():Void
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
 		var targetFolder: String  = "";
@@ -214,18 +227,21 @@ class LibraryBuild
         }
 	}
 
-	private function preBuildPerPlatform()
+	private function preBuildPerPlatform(): Void
 	{
     }
 
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
 
 	#elseif platform_flash
 
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
+	{
+	}
+	private function postPostParsePerPlatform():Void
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
 		var targetFolder: String  = "";
@@ -244,29 +260,31 @@ class LibraryBuild
         }
 
 	}
-
-	private function preBuildPerPlatform()
+	private function preBuildPerPlatform(): Void
 	{
 	}
 
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
 
 	#else
 
-	private function postParsePerPlatform()
+	private function postParsePerPlatform(): Void
+	{
+		
+	}
+	private function postPostParsePerPlatform(): Void
+	{
+	    
+	}
+	private function preBuildPerPlatform(): Void
 	{
 		
 	}
 
-	private function preBuildPerPlatform()
-	{
-		
-	}
-
-	private function postBuildPerPlatform()
+	private function postBuildPerPlatform(): Void
 	{
 
 	}
