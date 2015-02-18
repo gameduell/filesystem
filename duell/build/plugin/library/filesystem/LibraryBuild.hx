@@ -28,7 +28,6 @@ class LibraryBuild
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 
 	private var fileListToCopy: List<{fullPath : String, relativeFilePath : String}>;
-
 	public function new ()
     {
 		fileListToCopy = new List<{fullPath : String, relativeFilePath : String}>();
@@ -67,6 +66,9 @@ class LibraryBuild
 	{
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
+			if(folder == null)
+				return;
+				
 			var files = duell.helpers.PathHelper.getRecursiveFileListUnderFolder(folder);
 
 			for (file in files)
@@ -221,9 +223,12 @@ class LibraryBuild
         	PathHelper.mkdir(targetFolder);
         	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
 			
-			LogHelper.info('[FILESYSTEM] Embedding html5 asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
         	/// Add files as resources to haxe arguments
-        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	if(LibraryConfiguration.getData().EMBED_ASSETS)
+        	{
+				LogHelper.info('[FILESYSTEM] Embedding html5 asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	}
         }
 	}
 
@@ -254,9 +259,12 @@ class LibraryBuild
         	PathHelper.mkdir(targetFolder);
         	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
 			
-			LogHelper.info('[FILESYSTEM] Embedding flash asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
         	/// Add files as resources to haxe arguments
-        	Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	if(LibraryConfiguration.getData().EMBED_ASSETS)
+        	{
+        		LogHelper.info('[FILESYSTEM] Embedding flash asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	}
         }
 
 	}

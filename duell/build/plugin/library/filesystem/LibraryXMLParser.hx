@@ -33,11 +33,19 @@ class LibraryXMLParser
 
 				case 'exclude':
 					parseExcludeElement(element);
+				case 'embed-assets':
+					parseEmbedAssetsElement(element);
 			}
 		}
 	}
-
-	private static function parseStaticAssetsElement(element: Fast)
+	private static function parseEmbedAssetsElement(element: Fast): Void
+	{
+	    if(element.has.value)
+	    {
+	    	LibraryConfiguration.getData().EMBED_ASSETS = element.att.value == "true";
+	    }
+	}
+	private static function parseStaticAssetsElement(element: Fast): Void
 	{
 		if (element.has.path)
 		{
@@ -45,7 +53,7 @@ class LibraryXMLParser
 		}
 	}
 
-	private static function parseExcludeElement(element: Fast)
+	private static function parseExcludeElement(element: Fast): Void
 	{
 		if (element.has.path)
 		{

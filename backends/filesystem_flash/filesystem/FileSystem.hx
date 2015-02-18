@@ -299,7 +299,7 @@ class FileSystem
 
     public static function preloadStaticAssets(complete: Void -> Void): Void
     {
-        /*if (filesystem.StaticAssetList.list.length == 0)
+        if (filesystem.StaticAssetList.list.length == 0)
         {
             complete();
             return;
@@ -309,9 +309,30 @@ class FileSystem
             return element.urlEncode();
         }
         requestsLeft = filesystem.StaticAssetList.list.length;
-
+        function checkIfAvailableInResourcesAndAddtoFilesystem(fileName: String): Bool
+        {
+            var haxeBytes = haxe.Resource.getBytes(fileName);
+            if(haxeBytes == null)
+            {
+                return false;
+            }
+            var data = haxeBytes.getTypesData();
+            var correctedUrl: String = fileName.split("/").map(StringTools.urlEncode).join("/");
+            FileSystem.instance().staticData[correctedUrl] = data;
+            haxeBytes = null;
+            return true;
+        }
         for (val in filesystem.StaticAssetList.list)
         {
+            if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
+            {
+                requestsLeft--;
+                if (requestsLeft == 0)
+                {
+                    complete();
+                }
+                continue;
+            }
             var valWithAssets = "assets/" + val;
             valWithAssets.split("/").map(encodeURLElement).join("/");
             var loader: URLLoader = new URLLoader();
@@ -341,22 +362,7 @@ class FileSystem
             });
             var req = new URLRequest(getBaseURL() + valWithAssets);
             loader.load(req);
-        }*/
-
-        if (filesystem.StaticAssetList.list.length == 0)
-        {
-            complete();
-            return;
-        }
-        for(val in filesystem.StaticAssetList.list)
-        {
-            var haxeBytes = haxe.Resource.getBytes( val );
-            var data = haxeBytes.getTypesData();
-            var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
-            FileSystem.instance().staticData[correctedUrl] = data;
-            haxeBytes = null;
-        }
-        complete();        
+        }     
     }
 
     public function getData(url:String): Data
