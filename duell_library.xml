@@ -7,6 +7,5 @@
     <include path="backends/filesystem_android/duell_library.xml" if="android" />
     <include path="backends/filesystem_ios/duell_library.xml" if="ios" />
     <include path="backends/filesystem_flash/duell_library.xml" if="flash" />
-    <include path="backends/filesystem_macane/duell_library.xml" if="macane" />
 
 </library>
