@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library>
 
-	<haxelib name="air3" version="0.0.1" />
+	<haxelib name="air3" />
 
 </library>
