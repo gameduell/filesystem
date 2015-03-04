@@ -169,6 +169,12 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(FileSystem.instance().isFile(testFileURL));
     }
 
+    public function testExistenceStaticFolder()
+    {
+        var testFileURL = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder/TestFileSub.txt";
+        assertTrue(FileSystem.instance().urlExists(testFileURL));
+    }
+
     public function testDelete()
     {
         var testFolderForDeletion = testCacheFolder + "/testFolderForDeletion";
