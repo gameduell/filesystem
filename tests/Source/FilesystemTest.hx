@@ -69,11 +69,11 @@ class FileSystemTest extends unittest.TestCase {
     public function testStaticAssetList()
     {
         var expectedList = [
-        
             "lime.png",
             "lime.svg",
+            "subfolderTestFolder/TestFileSub.txt",
             "TestFile.txt",
-            "TestFileBadCharacters +~@.txt",
+            "TestFileBadCharacters +~@.txt"
         ];
 
         assertTrue(expectedList.length == StaticAssetList.list.length);
