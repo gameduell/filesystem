@@ -55,7 +55,7 @@ static bool isStaticFile(const char* filename)
 
 #define CHECK_STATIC_FILE_EXIT_FALSE(filename) if(isStaticFile(filename)) return alloc_bool(false);
 #define CHECK_STATIC_FILE_EXIT_NULL(filename) if(isStaticFile(filename)) return alloc_null();
-
+#define IS_FOLDER(dir) AAssetDir_getNextFileName((dir)) != NULL
 
 static value filesystem_android_create_file(value url) 
 {
@@ -119,23 +119,22 @@ static value filesystem_android_open_file_read(value url)
 {
 	const char *c_str = val_string(url);
 
-	if(isStaticFile(c_str))
+	if (isStaticFile(c_str))
 	{
-        
 		const char *withoutStaticFilePrefix = c_str + sizeOfStaticFilePrefix;
 
 		///will crash if this is not done
-		while(withoutStaticFilePrefix[0] == '/')
+		while (withoutStaticFilePrefix[0] == '/')
+		{
 			withoutStaticFilePrefix++;
+        }
 
 		AAsset* asset = AAssetManager_open(nativeAssetManager, withoutStaticFilePrefix, AASSET_MODE_RANDOM);
 
-		if(!asset)
+		if (!asset)
 		{
-
 			return alloc_null();
 		}
-
 
 		value hxFileHandle = FileHandle::createHaxePointer();
 		FileHandle* filehandle = ((FileHandle*)val_data(hxFileHandle));
@@ -151,8 +150,6 @@ static value filesystem_android_open_file_read(value url)
 	}
 	else
 	{
-
-
 		FILE *file = fopen(c_str, "r");
 
 		if(!file)
@@ -171,7 +168,6 @@ static value filesystem_android_open_file_read(value url)
 		filehandle->fileHandle = file;
 
 		return hxFileHandle;
-
 	}
 }
 DEFINE_PRIM (filesystem_android_open_file_read, 1);
@@ -198,23 +194,31 @@ static value filesystem_android_url_exists(value str)
 	if(isStaticFile(c_str))
 	{
 		const char *withoutStaticFilePrefix = c_str + sizeOfStaticFilePrefix;
+
+        while (withoutStaticFilePrefix[0] == '/')
+        {
+            withoutStaticFilePrefix++;
+        }
+
 		AAsset* asset = AAssetManager_open(nativeAssetManager, withoutStaticFilePrefix, AASSET_MODE_RANDOM);
 
-		if(asset)
+		if (asset)
 		{
 			AAsset_close(asset);
 			return alloc_bool(true);
 		}
 
-		AAssetDir* assetDir = AAssetManager_openDir(nativeAssetManager, withoutStaticFilePrefix);
+        AAssetDir* assetDir = AAssetManager_openDir(nativeAssetManager, withoutStaticFilePrefix);
+        bool foundDirectory = false;
 
-		if(assetDir)
+		if (IS_FOLDER(assetDir))
 		{
-			AAssetDir_close(assetDir);
-			return alloc_bool(true);
+			foundDirectory = true;
 		}
 
-		return alloc_bool(false);
+		AAssetDir_close(assetDir);
+
+		return alloc_bool(foundDirectory);
 	}
 	else
 	{
@@ -229,23 +233,34 @@ static value filesystem_android_is_folder(value str)
 	struct stat fileStat;
 	const char *c_str = val_string(str);
 
-	if(isStaticFile(c_str))
+	if (isStaticFile(c_str))
 	{
 		const char *withoutStaticFilePrefix = c_str + sizeOfStaticFilePrefix;
+
+		while (withoutStaticFilePrefix[0] == '/')
+        {
+            withoutStaticFilePrefix++;
+        }
+
 		AAssetDir* assetDir = AAssetManager_openDir(nativeAssetManager, withoutStaticFilePrefix);
 
-		if(assetDir)
+        bool foundDirectory = false;
+
+		if (IS_FOLDER(assetDir))
 		{
-			AAssetDir_close(assetDir);
-			return alloc_bool(true);
+			foundDirectory = true;
 		}
 
-		return alloc_bool(false);
+		AAssetDir_close(assetDir);
+
+		return alloc_bool(foundDirectory);
 	}
 	else
 	{
-		if(stat(c_str, &fileStat) < 0)
+		if (stat(c_str, &fileStat) < 0)
+		{
 			return alloc_bool(false);
+        }
 
   	 	return alloc_bool(S_ISDIR(fileStat.st_mode));
   	}
@@ -257,7 +272,7 @@ static value filesystem_android_is_file(value str)
 	struct stat fileStat;
 	const char *c_str = val_string(str);
 
-	if(isStaticFile(c_str))
+	if (isStaticFile(c_str))
 	{
 		const char *withoutStaticFilePrefix = c_str + sizeOfStaticFilePrefix;
 		AAsset* asset = AAssetManager_open(nativeAssetManager, withoutStaticFilePrefix, AASSET_MODE_RANDOM);
