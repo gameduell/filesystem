@@ -253,5 +253,16 @@ class FileSystemTest extends unittest.TestCase {
         fileWrite.close();
     }
     
-    
+    public function testStaticFolderExistence()
+    {
+        var existentFolder = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder";
+        assertTrue(FileSystem.instance().urlExists(existentFolder));
+        assertTrue(FileSystem.instance().isFolder(existentFolder));
+        assertFalse(FileSystem.instance().isFile(existentFolder));
+
+        var nonExistentFolder = FileSystem.instance().urlToStaticData() + "/nope";
+        assertFalse(FileSystem.instance().urlExists(nonExistentFolder));
+        assertFalse(FileSystem.instance().isFolder(nonExistentFolder));
+        assertFalse(FileSystem.instance().isFile(nonExistentFolder));
+    }
 }

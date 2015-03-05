@@ -125,8 +125,8 @@ static value filesystem_android_open_file_read(value url)
 
 		///will crash if this is not done
 		while (withoutStaticFilePrefix[0] == '/')
-		{
-			withoutStaticFilePrefix++;
+        {
+            withoutStaticFilePrefix++;
         }
 
 		AAsset* asset = AAssetManager_open(nativeAssetManager, withoutStaticFilePrefix, AASSET_MODE_RANDOM);
@@ -275,6 +275,12 @@ static value filesystem_android_is_file(value str)
 	if (isStaticFile(c_str))
 	{
 		const char *withoutStaticFilePrefix = c_str + sizeOfStaticFilePrefix;
+
+		while (withoutStaticFilePrefix[0] == '/')
+        {
+            withoutStaticFilePrefix++;
+        }
+
 		AAsset* asset = AAssetManager_open(nativeAssetManager, withoutStaticFilePrefix, AASSET_MODE_RANDOM);
 
 		if(asset)
