@@ -68,7 +68,12 @@ class LibraryBuild
 		{
 			if(folder == null)
 				return;
-				
+
+            // add to subfolders
+            var subfolders = duell.helpers.PathHelper.getRecursiveFolderListUnderFolder(folder);
+            LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS = LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS.concat(subfolders);
+
+            // add to filenames
 			var files = duell.helpers.PathHelper.getRecursiveFileListUnderFolder(folder);
 
 			for (file in files)

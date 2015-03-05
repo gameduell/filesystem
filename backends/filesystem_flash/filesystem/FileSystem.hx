@@ -241,6 +241,11 @@ class FileSystem
 
     public function urlExists(url: String): Bool
     {
+        if (isFolder(url))
+        {
+            return true;
+        }
+
         var map = getDataDictionaryBasedOnPrefix(url);
 
         if (map == null)
@@ -256,13 +261,25 @@ class FileSystem
     {
         var map = getDataDictionaryBasedOnPrefix(url);
 
-        if (map == null)
+        var withoutPrefix = trimURLPrefix(url);
+
+        if (map == staticData)
         {
-            return false;
+            // we're working on static data
+            if (StaticAssetList.folders.indexOf(withoutPrefix) != -1)
+            {
+                return true;
+            }
+        }
+        else if (map != null)
+        {
+            if (map.exists(withoutPrefix) && map[withoutPrefix] == null)
+            {
+                return true;
+            }
         }
 
-        var withoutPrefix = trimURLPrefix(url);
-        return map.exists(withoutPrefix) && map[withoutPrefix] == null;
+        return false;
     }
 
     public function isFile(url: String): Bool

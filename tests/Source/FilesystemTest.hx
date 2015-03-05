@@ -83,6 +83,20 @@ class FileSystemTest extends unittest.TestCase {
             assertEquals(expectedList[i], StaticAssetList.list[i]);
         }
     }
+
+    public function testStaticAssetSubfolderList()
+    {
+        var expectedList = [
+            "subfolderTestFolder"
+        ];
+
+        assertTrue(expectedList.length == StaticAssetList.folders.length);
+
+        for (i in 0...expectedList.length)
+        {
+            assertEquals(expectedList[i], StaticAssetList.folders[i]);
+        }
+    }
     
     public function testReadFromStatic()
     {

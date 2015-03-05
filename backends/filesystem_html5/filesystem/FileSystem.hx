@@ -185,6 +185,11 @@ class FileSystem
 
 	public function urlExists(url : String) : Bool
 	{
+        if (isFolder(url))
+        {
+            return true;
+        }
+
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
@@ -193,17 +198,31 @@ class FileSystem
 		var withoutPrefix = trimURLPrefix(url);
 		return map.exists(withoutPrefix);
 	}
-	
-	public function isFolder(url : String) : Bool
-	{
-		var map = getDataDictionaryBasedOnPrefix(url);
 
-		if(map == null)
-			return false;
+    public function isFolder(url: String): Bool
+    {
+        var map = getDataDictionaryBasedOnPrefix(url);
 
-		var withoutPrefix = trimURLPrefix(url);
-		return map.exists(withoutPrefix) && map[withoutPrefix] == null;
-	}
+        var withoutPrefix = trimURLPrefix(url);
+
+        if (map == staticData)
+        {
+            // we're working on static data
+            if (StaticAssetList.folders.indexOf(withoutPrefix) != -1)
+            {
+                return true;
+            }
+        }
+        else if (map != null)
+        {
+            if (map.exists(withoutPrefix) && map[withoutPrefix] == null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	public function isFile(url : String) : Bool
 	{
