@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:d="duell"
+           targetNamespace="duell"
+           elementFormDefault="qualified">
+
+    <xs:include schemaLocation="../duell/common_schema.xsd" />
+
+    <xs:complexType name="filesystem">
+        <xs:sequence>
+            <xs:element name="static-assets" minOccurs="0" maxOccurs="unbounded" type="d:Path"/>
+            <xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="d:Path"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
