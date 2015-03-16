@@ -7,10 +7,11 @@
     <xs:include schemaLocation="../duell/schema/common_schema.xsd" />
 
     <xs:complexType name="filesystem">
-        <xs:sequence>
-            <xs:element name="static-assets" minOccurs="0" maxOccurs="unbounded" type="d:Path"/>
-            <xs:element name="exclude" minOccurs="0" maxOccurs="unbounded" type="d:Path"/>
-        </xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="static-assets" type="d:Path"/>
+            <xs:element name="exclude" type="d:Path"/>
+            <xs:element name="embed-assets" type="d:ValueBoolean" default="false" />
+        </xs:choice>
     </xs:complexType>
 
 </xs:schema>
