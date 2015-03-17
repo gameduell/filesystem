@@ -10,7 +10,7 @@
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="static-assets" type="d:Path"/>
             <xs:element name="exclude" type="d:Path"/>
-            <xs:element name="embed-assets" type="d:ValueBoolean" default="false" />
+            <xs:element name="embed-assets" type="d:ValueBoolean"/>
         </xs:choice>
     </xs:complexType>
 
