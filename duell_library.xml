@@ -2,7 +2,7 @@
 <library xmlns="duell">
 
     <supported-haxe-version version="3.1.0+" />
-    <supported-duell-tool version="1.1.0+" />
+    <supported-duell-tool version="1.4.0+" />
 
 	<duelllib name="types" version="2.0.0+" />
 
