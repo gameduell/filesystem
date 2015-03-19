@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project>
-	
+<project xmlns="duell">
+
+    <supported-build-plugin name="android" version="master" />
+
 	<app title="Filesystem Testing" 
 		 file="filesystemtests" 
 		 package="com.haxe.duell.filesystemtesting" 
