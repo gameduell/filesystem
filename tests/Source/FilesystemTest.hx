@@ -10,7 +10,7 @@ using StringTools;
 import Date;
 
 class FileSystemTest extends unittest.TestCase {
-    
+
 
     public function new ()
     {
@@ -80,7 +80,7 @@ class FileSystemTest extends unittest.TestCase {
 
         for (i in 0...expectedList.length)
         {
-            assertEquals(expectedList[i], StaticAssetList.list[i]);
+            assertTrue(StaticAssetList.list.indexOf(expectedList[i]) != -1);
         }
     }
 
@@ -97,7 +97,7 @@ class FileSystemTest extends unittest.TestCase {
             assertEquals(expectedList[i], StaticAssetList.folders[i]);
         }
     }
-    
+
     public function testReadFromStatic()
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.txt";
@@ -121,7 +121,7 @@ class FileSystemTest extends unittest.TestCase {
 
         fileRead.close();
     }
-    
+
     public function testWrite()
     {
         var testFileURL = testCacheFolder + "/TestFile.txt";
@@ -220,9 +220,9 @@ class FileSystemTest extends unittest.TestCase {
         var fileSize = FileSystem.instance().getFileSize(testFileURL);
 
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
-        
+
         assertTrue(fileRead != null);
-        
+
         var data = new Data(fileSize);
 
         var str = "";
@@ -236,7 +236,7 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
     }
 
-    
+
     public function testWriteWeirdCharacterFile()
     {
         var testFileURL = testCacheFolder + "/TestFileBadCharacters +~@.txt".urlEncode();
@@ -266,7 +266,7 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
         fileWrite.close();
     }
-    
+
     public function testStaticFolderExistence()
     {
         var existentFolder = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder";
