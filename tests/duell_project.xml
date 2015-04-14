@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	
-	<app title="Filesystem Testing" 
-		 file="filesystemtests" 
-		 package="com.haxe.duell.filesystemtesting" 
-		 version="0.0.1" 
+
+	<app title="Filesystem Testing"
+		 file="filesystemtests"
+		 package="com.haxe.duell.filesystemtesting"
+		 version="0.0.1"
 		 company="GameDuell GmbH" />
 
 	<main name="MainTester" />
 
 	<source path="Source" />
 
-	<duelllib name="duellkit" version="1.0.0+" />
-	<duelllib name="unittest" version="1.0.0+"/>
+	<duelllib name="duellkit" version="3.0.0+" />
+	<duelllib name="unittest" version="3.0.0+"/>
 	<duelllib name="filesystem"  version="master"/>
 
 	<library-config>
@@ -22,4 +22,3 @@
 	</library-config>
 
 </project>
-
