@@ -18,7 +18,7 @@ class MainTester
 
     static function start() : Void
     {
-        r = new TestRunner(testComplete);
+        r = new TestRunner(testComplete, DuellKit.instance().onError);
 		r.add(new FileSystemTest());
 
         #if test
