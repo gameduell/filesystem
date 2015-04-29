@@ -6,10 +6,18 @@
 
     <xs:include schemaLocation="../duell/schema/common_schema.xsd" />
 
+    <xs:complexType name="RegExp">
+        <xs:simpleContent>
+            <xs:extension base="d:NonEmptyString">
+                <xs:attribute name="regex" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
     <xs:complexType name="filesystem">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="static-assets" type="d:Path"/>
-            <xs:element name="exclude" type="d:Path"/>
+            <xs:element name="ignore" type="d:RegExp"/>
             <xs:element name="embed-assets" type="d:ValueBoolean"/>
         </xs:choice>
     </xs:complexType>
