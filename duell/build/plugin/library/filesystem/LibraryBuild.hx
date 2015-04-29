@@ -15,12 +15,7 @@ import duell.helpers.TemplateHelper;
 import duell.helpers.FileHelper;
 import duell.helpers.PathHelper;
 import duell.helpers.LogHelper;
-import duell.helpers.DirHashHelper;
 
-import sys.FileSystem;
-import sys.io.File;
-
-using duell.helpers.HashHelper;
 
 import sys.io.Process;
 
@@ -30,13 +25,13 @@ import haxe.io.Path;
 
 class LibraryBuild
 {
-	public static var pathToAssetStagingArea: String = null; /// will be set after post
-
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 
-	private var hashPath: String;
-
-	public function new () {}
+	private var fileListToCopy: List<{fullPath : String, relativeFilePath : String}>;
+	public function new ()
+    {
+		fileListToCopy = new List<{fullPath : String, relativeFilePath : String}>();
+    }
 
 	public function postParse() : Void
 	{
@@ -51,51 +46,59 @@ class LibraryBuild
 		{
 			Configuration.getData().SOURCES.push(haxeExtraSources);
 		}
-
+		determineFileListFromAssetFolders();
 		postParsePerPlatform();
 	}
-
 	public function postPostParse(): Void
 	{
-		pathToAssetStagingArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
-		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
-
-		var currentHash = getHashOfAssetFolders();
-
-		var previousHash = getCachedHash();
-
-		if (currentHash != previousHash)
-		{
-			LogHelper.info("[Filesystem] Assets changed! reprocessing");
-			if (FileSystem.exists(pathToAssetStagingArea))
-			{
-				PathHelper.removeDirectory(pathToAssetStagingArea);
-			}
-
-			PathHelper.mkdir(pathToAssetStagingArea);
-
-			copyFilesToStagingArea();
-
-			processFiles();
-
-			saveHash(currentHash);
-		}
-		else
-		{
-			LogHelper.info("[Filesystem] no asset change! bypassing the processing");
-		}
-
-		cleanUpIgnoredFiles();
+		removeExcludedFiles();
 	    postPostParsePerPlatform();
 	}
 
 	public function preBuild() : Void
 	{
-		determineFileListFromAssetFolders();
-
 		copyAssetListHaxeFile();
 
 		preBuildPerPlatform();
+	}
+
+	private function determineFileListFromAssetFolders() : Void
+	{
+		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
+		{
+			if(folder == null)
+				return;
+
+            // add to subfolders
+            var subfolders = duell.helpers.PathHelper.getRecursiveFolderListUnderFolder(folder);
+            LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS = LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS.concat(subfolders);
+
+            // add to filenames
+			var files = duell.helpers.PathHelper.getRecursiveFileListUnderFolder(folder);
+
+			for (file in files)
+			{
+				fileListToCopy.push({fullPath : Path.join([folder, file]), relativeFilePath : file});
+				LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
+			}
+		}
+	}
+
+	private function removeExcludedFiles(): Void
+	{
+		for (excludedPath in LibraryConfiguration.getData().EXCLUDE_ASSET_FILENAMES)
+		{
+			var regex: EReg = new EReg(regexifyPath(excludedPath), "i");
+
+			for (pathObject in fileListToCopy)
+			{
+				if (regex.match(pathObject.fullPath))
+				{
+					LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.remove(pathObject.relativeFilePath);
+					fileListToCopy.remove(pathObject);
+				}
+			}
+		}
 	}
 
 	private static function regexifyPath(path: String): String
@@ -119,100 +122,10 @@ class LibraryBuild
 
         TemplateHelper.recursiveCopyTemplatedFiles(classSourcePath, exportPath, Configuration.getData(), Configuration.getData().TEMPLATE_FUNCTIONS);
 	}
-
+	
 	public function postBuild() : Void
 	{
 		postBuildPerPlatform();
-	}
-
-	private function getHashOfAssetFolders(): Int
-	{
-		var arrayOfHashes = [];
-		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
-		{
-			addHashOfFolderRecursively(arrayOfHashes, folder);
-		}
-
-		return arrayOfHashes.getFnv32IntFromIntArray();
-	}
-
-	private function addHashOfFolderRecursively(arrayOfHashes: Array<Int>, folder): Void
-	{
-		var hash: Int = DirHashHelper.getHashOfDirectory(folder);
-		arrayOfHashes.push(hash);
-
-		var folderList = PathHelper.getRecursiveFolderListUnderFolder(folder);
-		for (innerFolder in folderList)
-		{
-			addHashOfFolderRecursively(arrayOfHashes, Path.join([folder, innerFolder]));
-		}
-	}
-
-	private function getCachedHash(): Int
-	{
-		if (FileSystem.exists(hashPath))
-		{
-            var hash: String = File.getContent(hashPath);
-
-            return Std.parseInt(hash);
-		}
-		return 0;
-	}
-
-	private function saveHash(hash: Int): Void
-	{
-        if (FileSystem.exists(hashPath))
-        {
-            FileSystem.deleteFile(hashPath);
-        }
-
-        File.saveContent(hashPath, Std.string(hash));
-	}
-
-	private function copyFilesToStagingArea(): Void
-	{
-		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
-		{
-			if(folder == null)
-				return;
-
-			FileHelper.recursiveCopyFiles(folder, pathToAssetStagingArea);
-		}
-	}
-
-	private function cleanUpIgnoredFiles(): Void
-	{
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
-		for (file in files)
-		{
-			for (regex in LibraryConfiguration.getData().IGNORE_LIST)
-			{
-				if (regex.match(file))
-				{
-					FileSystem.deleteFile(Path.join([pathToAssetStagingArea, file]));
-				}
-			}
-		}
-	}
-
-	private function processFiles(): Void
-	{
-		AssetProcessorRegister.process();
-	}
-
-	private function determineFileListFromAssetFolders() : Void
-	{
-		// add to subfolders
-		var subfolders = PathHelper.getRecursiveFolderListUnderFolder(pathToAssetStagingArea);
-		LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS = LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS.concat(subfolders);
-
-		// add to filenames
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
-
-		for (file in files)
-		{
-			LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
-		}
 	}
 
 	#if platform_ios
@@ -224,7 +137,7 @@ class LibraryBuild
 		var fileID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
 		PlatformConfiguration.getData().ADDL_PBX_BUILD_FILE.push('      ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */ = {isa = PBXBuildFile; fileRef = ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */; };');
 		PlatformConfiguration.getData().ADDL_PBX_FILE_REFERENCE.push('      ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */ = {isa = PBXFileReference; lastKnownFileType = folder; name = $INTERNAL_ASSET_FOLDER; path = ' + Configuration.getData().APP.FILE + '/$INTERNAL_ASSET_FOLDER; sourceTree = \"<group>\"; };');
-		PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push('            ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */,');
+		PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push('            ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */,');			
 		PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push('            ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */,');
 	}
 
@@ -239,13 +152,32 @@ class LibraryBuild
 		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
 		PathHelper.mkdir(targetFolder);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
         for (file in fileListToCopy)
         {
-        	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file)]);
+        	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToAssetStagingArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]));
         }
+	}
+
+	private function postBuildPerPlatform(): Void
+	{
+
+	}
+
+    #elseif platform_macane
+
+	private function postParsePerPlatform(): Void
+	{
+
+	}
+	private function postPostParsePerPlatform():Void
+	{
+	}
+
+	private function preBuildPerPlatform(): Void
+	{
+
 	}
 
 	private function postBuildPerPlatform(): Void
@@ -267,13 +199,11 @@ class LibraryBuild
 
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
-
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
         for (file in fileListToCopy)
         {
-        	var targetFolder = Path.join([targetDirectory, Path.directory(file)]);
+        	var targetFolder = Path.join([targetDirectory, Path.directory(file.relativeFilePath)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToAssetStagingArea, file]), Path.join([targetDirectory, file]));
+        	FileHelper.copyIfNewer(file.fullPath, Path.join([targetDirectory, file.relativeFilePath]));
         }
 	}
 
@@ -288,22 +218,21 @@ class LibraryBuild
 	}
 	private function postPostParsePerPlatform():Void
 	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web", INTERNAL_ASSET_FOLDER]);
-
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
-
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web"]);
+		var targetFolder: String  = "";
+		var fileDestinationFullPath: String = "";
         for (file in fileListToCopy)
         {
-			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToAssetStagingArea, file]);
-        	PathHelper.mkdir(Path.directory(file));
-        	FileHelper.copyIfNewer(origPath, destPath);
-
+        	targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
+			fileDestinationFullPath = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
+			
         	/// Add files as resources to haxe arguments
         	if(LibraryConfiguration.getData().EMBED_ASSETS)
         	{
-				LogHelper.info('[FILESYSTEM] Embedding html5 asset ' + destPath + "@" + file);
-        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
+				LogHelper.info('[FILESYSTEM] Embedding html5 asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
         	}
         }
 	}
@@ -322,29 +251,28 @@ class LibraryBuild
 	private function postParsePerPlatform(): Void
 	{
 	}
-
 	private function postPostParsePerPlatform():Void
 	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web", INTERNAL_ASSET_FOLDER]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web"]);
+		var targetFolder: String  = "";
+		var fileDestinationFullPath: String = "";
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+        for (file in fileListToCopy)
+        {
+        	targetFolder = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file.relativeFilePath)]);
+			fileDestinationFullPath = Path.join([targetDirectory, INTERNAL_ASSET_FOLDER, file.relativeFilePath]);
+        	PathHelper.mkdir(targetFolder);
+        	FileHelper.copyIfNewer(file.fullPath, fileDestinationFullPath);
+			
+        	/// Add files as resources to haxe arguments
+        	if(LibraryConfiguration.getData().EMBED_ASSETS)
+        	{
+        		LogHelper.info('[FILESYSTEM] Embedding flash asset '+fileDestinationFullPath+"@"+file.relativeFilePath);
+        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource "+fileDestinationFullPath+"@"+file.relativeFilePath);
+        	}
+        }
 
-	    for (file in fileListToCopy)
-	    {
-			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToAssetStagingArea, file]);
-	    	PathHelper.mkdir(Path.directory(file));
-	    	FileHelper.copyIfNewer(origPath, destPath);
-
-	    	/// Add files as resources to haxe arguments
-	    	if(LibraryConfiguration.getData().EMBED_ASSETS)
-	    	{
-				LogHelper.info('[FILESYSTEM] Embedding flash asset ' + destPath + "@" + file);
-	    		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
-	    	}
-	    }
 	}
-
 	private function preBuildPerPlatform(): Void
 	{
 	}
@@ -358,15 +286,15 @@ class LibraryBuild
 
 	private function postParsePerPlatform(): Void
 	{
-
+		
 	}
 	private function postPostParsePerPlatform(): Void
 	{
-
+	    
 	}
 	private function preBuildPerPlatform(): Void
 	{
-
+		
 	}
 
 	private function postBuildPerPlatform(): Void

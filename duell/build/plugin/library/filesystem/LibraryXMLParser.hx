@@ -15,15 +15,13 @@ import duell.helpers.LogHelper;
 
 import haxe.xml.Fast;
 
-import EReg;
-
 class LibraryXMLParser
 {
 	public static function parse(xml : Fast) : Void
 	{
 		Configuration.getData().LIBRARY.FILESYSTEM = LibraryConfiguration.getData();
 
-		for (element in xml.elements)
+		for (element in xml.elements) 
 		{
 			if (!XMLHelper.isValidElement(element, DuellProjectXML.getConfig().parsingConditions))
 				continue;
@@ -33,9 +31,8 @@ class LibraryXMLParser
 				case 'static-assets':
 					parseStaticAssetsElement(element);
 
-				case 'ignore':
-					parseIgnoreElement(element);
-
+				case 'exclude':
+					parseExcludeElement(element);
 				case 'embed-assets':
 					parseEmbedAssetsElement(element);
 			}
@@ -56,19 +53,11 @@ class LibraryXMLParser
 		}
 	}
 
-	private static function parseIgnoreElement(element: Fast): Void
+	private static function parseExcludeElement(element: Fast): Void
 	{
-		if (element.has.regex)
+		if (element.has.path)
 		{
-			var regex = element.att.regex;
-			var firstBar = regex.indexOf("/");
-			var lastBar = regex.lastIndexOf("/");
-
-			var regexPart = regex.substr(firstBar + 1, lastBar - firstBar - 1);
-			var flags = regex.substr(lastBar + 1, regex.length - lastBar - 1);
-
-			var ereg = new EReg(regexPart, flags);
-			LibraryConfiguration.getData().IGNORE_LIST.push(ereg);
+			LibraryConfiguration.getData().EXCLUDE_ASSET_FILENAMES.push(resolvePath(element.att.path));
 		}
 	}
 

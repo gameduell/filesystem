@@ -279,14 +279,4 @@ class FileSystemTest extends unittest.TestCase {
         assertFalse(FileSystem.instance().isFolder(nonExistentFolder));
         assertFalse(FileSystem.instance().isFile(nonExistentFolder));
     }
-
-    public function testExistenceOfIgnoredFiles()
-    {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.tobeignored.txt";
-        assertTrue(!FileSystem.instance().urlExists(testFileURL));
-
-        testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile2.ToBeIgnored.txt";
-        assertTrue(!FileSystem.instance().urlExists(testFileURL));
-    }
-
 }
