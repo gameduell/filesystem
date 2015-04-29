@@ -66,7 +66,8 @@ class LibraryBuild
 
 		if (currentHash != previousHash)
 		{
-			LogHelper.info("[Filesystem] Assets changed! reprocessing");
+			LogHelper.info("", "[Filesystem] Assets changed! reprocessing");
+
 			if (FileSystem.exists(pathToAssetStagingArea))
 			{
 				PathHelper.removeDirectory(pathToAssetStagingArea);
@@ -76,16 +77,17 @@ class LibraryBuild
 
 			copyFilesToStagingArea();
 
+			cleanUpIgnoredFiles();
+
 			processFiles();
 
 			saveHash(currentHash);
 		}
 		else
 		{
-			LogHelper.info("[Filesystem] no asset change! bypassing the processing");
+			LogHelper.info("", "[Filesystem] no asset change! bypassing the processing");
 		}
 
-		cleanUpIgnoredFiles();
 	    postPostParsePerPlatform();
 	}
 
