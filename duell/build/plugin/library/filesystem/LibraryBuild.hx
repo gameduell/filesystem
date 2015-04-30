@@ -16,6 +16,7 @@ import duell.helpers.FileHelper;
 import duell.helpers.PathHelper;
 import duell.helpers.LogHelper;
 import duell.helpers.DirHashHelper;
+import duell.objects.Arguments;
 
 import sys.FileSystem;
 import sys.io.File;
@@ -60,11 +61,11 @@ class LibraryBuild
 		pathToAssetStagingArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
 		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
 
-		var currentHash = getHashOfAssetFolders();
+		var currentHash = generateCurrentHash();
 
 		var previousHash = getCachedHash();
 
-		if (currentHash != previousHash)
+		if (Arguments.isDefineSet("forceAssetProcessing") || currentHash != previousHash)
 		{
 			LogHelper.info("", "[Filesystem] Assets changed! reprocessing");
 
@@ -127,13 +128,15 @@ class LibraryBuild
 		postBuildPerPlatform();
 	}
 
-	private function getHashOfAssetFolders(): Int
+	private function generateCurrentHash(): Int
 	{
 		var arrayOfHashes = [];
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
 			addHashOfFolderRecursively(arrayOfHashes, folder);
 		}
+
+		arrayOfHashes = arrayOfHashes.concat(AssetProcessorRegister.hashList);
 
 		return arrayOfHashes.getFnv32IntFromIntArray();
 	}

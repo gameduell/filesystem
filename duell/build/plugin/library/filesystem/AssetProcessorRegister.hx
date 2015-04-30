@@ -12,8 +12,11 @@ class AssetProcessorRegister
 	private static var processorListMedium: Array<Void->Void> = [];
 	private static var processorListLow: Array<Void->Void> = [];
 	private static var processorListHigh: Array<Void->Void> = [];
-	public static function registerProcessor(proc: Void->Void, prio: AssetProcessorPriority)
+
+	public static var hashList(default, null): Array<Int> = [];
+	public static function registerProcessor(proc: Void->Void, prio: AssetProcessorPriority, currentHash: Int)
 	{
+		hashList.push(currentHash);
 		switch(prio)
 		{
 			case(AssetProcessorPriorityHigh):
