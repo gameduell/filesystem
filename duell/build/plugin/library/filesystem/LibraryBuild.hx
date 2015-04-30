@@ -29,10 +29,9 @@ using StringTools;
 
 import haxe.io.Path;
 
+@:access(duell.build.plugin.library.filesystem.AssetProcessorRegister)
 class LibraryBuild
 {
-	public static var pathToTemporaryAssetArea: String = null; /// will be set after post
-
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 
 	private var hashPath: String;
@@ -68,12 +67,12 @@ class LibraryBuild
 		{
 			LogHelper.info("", "[Filesystem] Assets changed! reprocessing");
 
-			if (FileSystem.exists(pathToTemporaryAssetArea))
+			if (FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
 			{
-				PathHelper.removeDirectory(pathToTemporaryAssetArea);
+				PathHelper.removeDirectory(AssetProcessorRegister.pathToTemporaryAssetArea);
 			}
 
-			PathHelper.mkdir(pathToTemporaryAssetArea);
+			PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
 
 			copyFilesToStagingArea();
 
@@ -85,6 +84,11 @@ class LibraryBuild
 		}
 		else
 		{
+            if (!FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
+            {
+                PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
+            }
+
 			LogHelper.info("", "[Filesystem] no asset change! bypassing the processing");
 		}
 
@@ -136,7 +140,7 @@ class LibraryBuild
 
 	private function generateVariables(): Void
 	{
-		pathToTemporaryAssetArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
+		AssetProcessorRegister.pathToTemporaryAssetArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
 		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
 	}
 
@@ -202,20 +206,20 @@ class LibraryBuild
 			if(folder == null)
 				return;
 
-			FileHelper.recursiveCopyFiles(folder, pathToTemporaryAssetArea);
+			FileHelper.recursiveCopyFiles(folder, AssetProcessorRegister.pathToTemporaryAssetArea);
 		}
 	}
 
 	private function cleanUpIgnoredFiles(): Void
 	{
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var files = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 		for (file in files)
 		{
 			for (regex in LibraryConfiguration.getData().IGNORE_LIST)
 			{
 				if (regex.match(file))
 				{
-					FileSystem.deleteFile(Path.join([pathToTemporaryAssetArea, file]));
+					FileSystem.deleteFile(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]));
 				}
 			}
 		}
@@ -229,11 +233,11 @@ class LibraryBuild
 	private function determineFileListFromAssetFolders() : Void
 	{
 		// add to subfolders
-		var subfolders = PathHelper.getRecursiveFolderListUnderFolder(pathToTemporaryAssetArea);
+		var subfolders = PathHelper.getRecursiveFolderListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 		LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS = LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS.concat(subfolders);
 
 		// add to filenames
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var files = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 
 		for (file in files)
 		{
@@ -265,12 +269,12 @@ class LibraryBuild
 		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
 		PathHelper.mkdir(targetFolder);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
+        	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
         }
 	}
 
@@ -294,12 +298,12 @@ class LibraryBuild
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([targetDirectory, Path.directory(file)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToTemporaryAssetArea, file]), Path.join([targetDirectory, file]));
+        	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([targetDirectory, file]));
         }
 	}
 
@@ -316,12 +320,12 @@ class LibraryBuild
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web", INTERNAL_ASSET_FOLDER]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 
         for (file in fileListToCopy)
         {
 			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToTemporaryAssetArea, file]);
+			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
         	PathHelper.mkdir(Path.directory(file));
         	FileHelper.copyIfNewer(origPath, destPath);
 
@@ -353,12 +357,12 @@ class LibraryBuild
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web", INTERNAL_ASSET_FOLDER]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 
 	    for (file in fileListToCopy)
 	    {
 			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToTemporaryAssetArea, file]);
+			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
 	    	PathHelper.mkdir(Path.directory(file));
 	    	FileHelper.copyIfNewer(origPath, destPath);
 
