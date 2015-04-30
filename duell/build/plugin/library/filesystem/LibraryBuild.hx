@@ -31,7 +31,7 @@ import haxe.io.Path;
 
 class LibraryBuild
 {
-	public static var pathToAssetStagingArea: String = null; /// will be set after post
+	public static var pathToTemporaryAssetArea: String = null; /// will be set after post
 
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
 
@@ -58,8 +58,7 @@ class LibraryBuild
 
 	public function postPostParse(): Void
 	{
-		pathToAssetStagingArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
-		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
+		generateVariables();
 
 		var currentHash = generateCurrentHash();
 
@@ -69,12 +68,12 @@ class LibraryBuild
 		{
 			LogHelper.info("", "[Filesystem] Assets changed! reprocessing");
 
-			if (FileSystem.exists(pathToAssetStagingArea))
+			if (FileSystem.exists(pathToTemporaryAssetArea))
 			{
-				PathHelper.removeDirectory(pathToAssetStagingArea);
+				PathHelper.removeDirectory(pathToTemporaryAssetArea);
 			}
 
-			PathHelper.mkdir(pathToAssetStagingArea);
+			PathHelper.mkdir(pathToTemporaryAssetArea);
 
 			copyFilesToStagingArea();
 
@@ -128,6 +127,20 @@ class LibraryBuild
 		postBuildPerPlatform();
 	}
 
+	public function clean(): Void
+	{
+		generateVariables();
+
+		deleteCachedHash();
+	}
+
+	private function generateVariables(): Void
+	{
+		pathToTemporaryAssetArea = Path.join([Configuration.getData().OUTPUT, "filesystem", INTERNAL_ASSET_FOLDER]);
+		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
+	}
+
+
 	private function generateCurrentHash(): Int
 	{
 		var arrayOfHashes = [];
@@ -164,6 +177,14 @@ class LibraryBuild
 		return 0;
 	}
 
+	private function deleteCachedHash(): Void
+	{
+		if (FileSystem.exists(hashPath))
+		{
+			FileSystem.deleteFile(hashPath);
+		}
+	}
+
 	private function saveHash(hash: Int): Void
 	{
         if (FileSystem.exists(hashPath))
@@ -181,20 +202,20 @@ class LibraryBuild
 			if(folder == null)
 				return;
 
-			FileHelper.recursiveCopyFiles(folder, pathToAssetStagingArea);
+			FileHelper.recursiveCopyFiles(folder, pathToTemporaryAssetArea);
 		}
 	}
 
 	private function cleanUpIgnoredFiles(): Void
 	{
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var files = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
 		for (file in files)
 		{
 			for (regex in LibraryConfiguration.getData().IGNORE_LIST)
 			{
 				if (regex.match(file))
 				{
-					FileSystem.deleteFile(Path.join([pathToAssetStagingArea, file]));
+					FileSystem.deleteFile(Path.join([pathToTemporaryAssetArea, file]));
 				}
 			}
 		}
@@ -208,11 +229,11 @@ class LibraryBuild
 	private function determineFileListFromAssetFolders() : Void
 	{
 		// add to subfolders
-		var subfolders = PathHelper.getRecursiveFolderListUnderFolder(pathToAssetStagingArea);
+		var subfolders = PathHelper.getRecursiveFolderListUnderFolder(pathToTemporaryAssetArea);
 		LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS = LibraryConfiguration.getData().STATIC_ASSET_SUBFOLDERS.concat(subfolders);
 
 		// add to filenames
-		var files = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var files = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
 
 		for (file in files)
 		{
@@ -244,12 +265,12 @@ class LibraryBuild
 		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
 		PathHelper.mkdir(targetFolder);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToAssetStagingArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
+        	FileHelper.copyIfNewer(Path.join([pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
         }
 	}
 
@@ -273,12 +294,12 @@ class LibraryBuild
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
         for (file in fileListToCopy)
         {
         	var targetFolder = Path.join([targetDirectory, Path.directory(file)]);
         	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([pathToAssetStagingArea, file]), Path.join([targetDirectory, file]));
+        	FileHelper.copyIfNewer(Path.join([pathToTemporaryAssetArea, file]), Path.join([targetDirectory, file]));
         }
 	}
 
@@ -295,12 +316,12 @@ class LibraryBuild
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web", INTERNAL_ASSET_FOLDER]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
 
         for (file in fileListToCopy)
         {
 			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToAssetStagingArea, file]);
+			var origPath = Path.join([pathToTemporaryAssetArea, file]);
         	PathHelper.mkdir(Path.directory(file));
         	FileHelper.copyIfNewer(origPath, destPath);
 
@@ -332,12 +353,12 @@ class LibraryBuild
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web", INTERNAL_ASSET_FOLDER]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToAssetStagingArea);
+		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(pathToTemporaryAssetArea);
 
 	    for (file in fileListToCopy)
 	    {
 			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([pathToAssetStagingArea, file]);
+			var origPath = Path.join([pathToTemporaryAssetArea, file]);
 	    	PathHelper.mkdir(Path.directory(file));
 	    	FileHelper.copyIfNewer(origPath, destPath);
 
