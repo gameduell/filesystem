@@ -4,7 +4,7 @@
 	
 	<files id="src">
 		
-		<include name="${haxelib:types}/backends/types_cpp/native.xml" />
+		<include name="${haxelib:duell_types}/backends/types_cpp/native.xml" />
 
 		<compilerflag value="-Iinclude"/>
 		<file name="src/FilesystemNativeInterface.cpp"/>
