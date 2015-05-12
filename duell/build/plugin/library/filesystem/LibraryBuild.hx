@@ -219,7 +219,12 @@ class LibraryBuild
 			{
 				if (regex.match(file))
 				{
-					FileSystem.deleteFile(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]));
+					var path = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
+					if (FileSystem.exists(path))
+					{
+						/// we might have duplicate regex
+						FileSystem.deleteFile(path);
+					}
 				}
 			}
 		}
@@ -326,7 +331,7 @@ class LibraryBuild
         {
 			var destPath = Path.join([targetDirectory, file]);
 			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-        	PathHelper.mkdir(Path.directory(file));
+        	PathHelper.mkdir(Path.directory(destPath));
         	FileHelper.copyIfNewer(origPath, destPath);
 
         	/// Add files as resources to haxe arguments
@@ -363,7 +368,7 @@ class LibraryBuild
 	    {
 			var destPath = Path.join([targetDirectory, file]);
 			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-	    	PathHelper.mkdir(Path.directory(file));
+	    	PathHelper.mkdir(Path.directory(destPath));
 	    	FileHelper.copyIfNewer(origPath, destPath);
 
 	    	/// Add files as resources to haxe arguments
