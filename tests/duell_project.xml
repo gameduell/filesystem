@@ -18,6 +18,7 @@
 	<library-config>
 		<filesystem>
 			<static-assets path="Assets" />
+			<ignore regex=" ~/.*\.tobeignored.*/i" />
 		</filesystem>
 	</library-config>
 
