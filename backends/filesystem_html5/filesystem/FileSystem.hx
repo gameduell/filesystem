@@ -270,7 +270,7 @@ class FileSystem
 	static private var requestsLeft : Int;
 	public static function preloadStaticAssets(complete : Void -> Void) : Void
 	{
-		
+
 		if(filesystem.StaticAssetList.list.length == 0)
 		{
 		  complete();
@@ -314,9 +314,9 @@ class FileSystem
 
 		  var oReq = new XMLHttpRequest();
 		  oReq.open("GET", valWithAssets, true);
-		  oReq.responseType = "arraybuffer";
+		  oReq.responseType = js.html.XMLHttpRequestResponseType.ARRAYBUFFER;
 
-		  oReq.onload = function (oEvent) 
+		  oReq.onload = function (oEvent)
 		  {
 		    requestsLeft -= 1;
 		      var arrayBuffer = oReq.response;
@@ -337,7 +337,7 @@ class FileSystem
 		}
 	}
 
-	public static function getBaseURL() 
+	public static function getBaseURL()
 	{
 			var location: js.html.Location =  js.Browser.location;
 		    var url = location.href;  // entire url including querystring - also: window.location.href;
@@ -345,7 +345,7 @@ class FileSystem
 
 	        // Root Url for domain name
 	        return baseURL + "/";
-		    
+
 	}
 	public function getData(url:String): Data
 	{
@@ -390,9 +390,8 @@ class FileSystem
 		else if(url.startsWith(tempDataURL))
 		{
 			return tempData;
-		}	
+		}
 
 		return null;
 	}
 }
-
