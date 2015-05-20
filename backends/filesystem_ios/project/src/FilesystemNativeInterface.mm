@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2003-2015, GameDuell GmbH
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include <hx/CFFI.h>
 #import <Foundation/Foundation.h>
 
@@ -19,15 +45,15 @@ static NSURL* hxstring_to_nsurl(value str)
 
 /// PATHS
 static value filesystem_ios_init() {
-	
+
 	filemanager = [[NSFileManager alloc] init];
 	return alloc_null();
-	
+
 }
 DEFINE_PRIM (filesystem_ios_init, 0);
 
 /// PATHS
-static value filesystem_ios_get_url_to_static_data() 
+static value filesystem_ios_get_url_to_static_data()
 {
 	NSString *url = [[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]] absoluteString];
 	value str = alloc_string([url UTF8String]);
@@ -35,7 +61,7 @@ static value filesystem_ios_get_url_to_static_data()
 }
 DEFINE_PRIM (filesystem_ios_get_url_to_static_data, 0);
 
-static value filesystem_ios_get_url_to_cached_data() 
+static value filesystem_ios_get_url_to_cached_data()
 {
 	NSArray *urls = [filemanager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask];
 	NSString *url = [[urls firstObject] absoluteString];
@@ -44,7 +70,7 @@ static value filesystem_ios_get_url_to_cached_data()
 }
 DEFINE_PRIM (filesystem_ios_get_url_to_cached_data, 0);
 
-static value filesystem_ios_get_url_to_temp_data() 
+static value filesystem_ios_get_url_to_temp_data()
 {
 	NSString *url = [[NSURL fileURLWithPath:NSTemporaryDirectory()] absoluteString];
 	value str = alloc_string([url UTF8String]);
@@ -52,7 +78,7 @@ static value filesystem_ios_get_url_to_temp_data()
 }
 DEFINE_PRIM (filesystem_ios_get_url_to_temp_data, 0);
 
-static value filesystem_ios_create_file(value str) 
+static value filesystem_ios_create_file(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	bool success = [filemanager createFileAtPath:[url path] contents:nil attributes:nil];
@@ -60,7 +86,7 @@ static value filesystem_ios_create_file(value str)
 }
 DEFINE_PRIM (filesystem_ios_create_file, 1);
 
-static value filesystem_ios_create_folder(value str) 
+static value filesystem_ios_create_folder(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	NSError *error = nil;
@@ -75,7 +101,7 @@ static value filesystem_ios_create_folder(value str)
 }
 DEFINE_PRIM (filesystem_ios_create_folder, 1);
 
-static value filesystem_ios_open_file_write(value url) 
+static value filesystem_ios_open_file_write(value url)
 {
 	NSError *error = nil;
 	NSFileHandle *handle = [NSFileHandle fileHandleForWritingToURL:hxstring_to_nsurl(url) error:&error];
@@ -98,7 +124,7 @@ static value filesystem_ios_open_file_write(value url)
 }
 DEFINE_PRIM (filesystem_ios_open_file_write, 1);
 
-static value filesystem_ios_open_file_read(value str) 
+static value filesystem_ios_open_file_read(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	NSError *error = nil;
@@ -128,7 +154,7 @@ static value filesystem_ios_open_file_read(value str)
 }
 DEFINE_PRIM (filesystem_ios_open_file_read, 1);
 
-static value filesystem_ios_delete_file(value str) 
+static value filesystem_ios_delete_file(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 
@@ -144,7 +170,7 @@ static value filesystem_ios_delete_file(value str)
 }
 DEFINE_PRIM (filesystem_ios_delete_file, 1);
 
-static value filesystem_ios_delete_folder(value str) 
+static value filesystem_ios_delete_folder(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 
@@ -160,7 +186,7 @@ static value filesystem_ios_delete_folder(value str)
 }
 DEFINE_PRIM (filesystem_ios_delete_folder, 1);
 
-static value filesystem_ios_url_exists(value str) 
+static value filesystem_ios_url_exists(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 
@@ -168,7 +194,7 @@ static value filesystem_ios_url_exists(value str)
 }
 DEFINE_PRIM (filesystem_ios_url_exists, 1);
 
-static value filesystem_ios_is_folder(value str) 
+static value filesystem_ios_is_folder(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	BOOL isDirectory = NO;
@@ -180,12 +206,12 @@ static value filesystem_ios_is_folder(value str)
 }
 DEFINE_PRIM (filesystem_ios_is_folder, 1);
 
-static value filesystem_ios_is_file(value str) 
+static value filesystem_ios_is_file(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	BOOL isDirectory = NO;
 	BOOL exists = [filemanager fileExistsAtPath:[url path] isDirectory:&isDirectory];
-	
+
 	if(!exists)
 		return alloc_bool(NO);
 	return alloc_bool(!isDirectory);
@@ -196,7 +222,7 @@ DEFINE_PRIM (filesystem_ios_is_file, 1);
 /// FILEHANDLE
 /// ======
 
-static value filesystem_ios_get_seek(value hxFileHandle) 
+static value filesystem_ios_get_seek(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -204,7 +230,7 @@ static value filesystem_ios_get_seek(value hxFileHandle)
 }
 DEFINE_PRIM (filesystem_ios_get_seek, 1);
 
-static value filesystem_ios_set_seek(value hxFileHandle, value seek) 
+static value filesystem_ios_set_seek(value hxFileHandle, value seek)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	[fileHandle->objcFileHandle seekToFileOffset:val_int(seek)];
@@ -213,7 +239,7 @@ static value filesystem_ios_set_seek(value hxFileHandle, value seek)
 }
 DEFINE_PRIM (filesystem_ios_set_seek, 2);
 
-static value filesystem_ios_seek_end_of_file(value hxFileHandle) 
+static value filesystem_ios_seek_end_of_file(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	[fileHandle->objcFileHandle seekToEndOfFile];
@@ -222,7 +248,7 @@ static value filesystem_ios_seek_end_of_file(value hxFileHandle)
 }
 DEFINE_PRIM (filesystem_ios_seek_end_of_file, 1);
 
-static value filesystem_ios_file_write(value hxFileHandle, value nativeData) 
+static value filesystem_ios_file_write(value hxFileHandle, value nativeData)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	NativeData* ptr = ((NativeData*)val_data(nativeData));
@@ -233,19 +259,19 @@ static value filesystem_ios_file_write(value hxFileHandle, value nativeData)
 }
 DEFINE_PRIM (filesystem_ios_file_write, 2);
 
-static value filesystem_ios_file_read(value hxFileHandle, value nativeData) 
+static value filesystem_ios_file_read(value hxFileHandle, value nativeData)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	NativeData* ptr = ((NativeData*)val_data(nativeData));
 	FILE *file = fdopen([fileHandle->objcFileHandle fileDescriptor], "r");
 
-	fread(ptr->ptr + ptr->offset, 1, ptr->offsetLength, file); 
+	fread(ptr->ptr + ptr->offset, 1, ptr->offsetLength, file);
 
 	return alloc_null();
 }
 DEFINE_PRIM (filesystem_ios_file_read, 2);
 
-static value filesystem_ios_file_close(value hxFileHandle) 
+static value filesystem_ios_file_close(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -260,9 +286,9 @@ DEFINE_PRIM (filesystem_ios_file_close, 1);
 /// OTHER
 /// ======
 extern "C" void filesystem_ios_main () {
-	
+
 	val_int(0); // Fix Neko init
-	
+
 }
 DEFINE_ENTRY_POINT (filesystem_ios_main);
 

@@ -7,6 +7,5 @@
     <include path="backends/filesystem_android/include.xml" if="android" />
     <include path="backends/filesystem_ios/include.xml" if="ios" />
     <include path="backends/filesystem_flash/include.xml" if="flash" />
-    <include path="backends/filesystem_macane/include.xml" if="macane" />
 
 </extension>

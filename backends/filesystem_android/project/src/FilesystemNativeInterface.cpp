@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2003-2015, GameDuell GmbH
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #define IMPLEMENT_API
 #include <hx/CFFI.h>
 
@@ -39,9 +65,9 @@ Java_org_haxe_duell_filesystem_DuellFileSystemNativeInterface_setupNativeAssetMa
 /// ======
 
 static value filesystem_android_init() {
-	
+
 	return alloc_null();
-	
+
 }
 DEFINE_PRIM (filesystem_android_init, 0);
 
@@ -57,7 +83,7 @@ static bool isStaticFile(const char* filename)
 #define CHECK_STATIC_FILE_EXIT_NULL(filename) if(isStaticFile(filename)) return alloc_null();
 #define IS_FOLDER(dir) AAssetDir_getNextFileName((dir)) != NULL
 
-static value filesystem_android_create_file(value url) 
+static value filesystem_android_create_file(value url)
 {
 	const char *c_str = val_string(url);
 	CHECK_STATIC_FILE_EXIT_FALSE(c_str);
@@ -74,12 +100,12 @@ static value filesystem_android_create_file(value url)
 	}
 
 	fclose(f);
-	
+
 	return alloc_bool(true);
 }
 DEFINE_PRIM (filesystem_android_create_file, 1);
 
-static value filesystem_android_create_folder(value url) 
+static value filesystem_android_create_folder(value url)
 {
 	const char *c_str = val_string(url);
 	CHECK_STATIC_FILE_EXIT_FALSE(c_str);
@@ -89,7 +115,7 @@ static value filesystem_android_create_folder(value url)
 }
 DEFINE_PRIM (filesystem_android_create_folder, 1);
 
-static value filesystem_android_open_file_write(value url) 
+static value filesystem_android_open_file_write(value url)
 {
 	const char *c_str = val_string(url);
 	CHECK_STATIC_FILE_EXIT_NULL(c_str);
@@ -115,7 +141,7 @@ static value filesystem_android_open_file_write(value url)
 }
 DEFINE_PRIM (filesystem_android_open_file_write, 1);
 
-static value filesystem_android_open_file_read(value url) 
+static value filesystem_android_open_file_read(value url)
 {
 	const char *c_str = val_string(url);
 
@@ -172,7 +198,7 @@ static value filesystem_android_open_file_read(value url)
 }
 DEFINE_PRIM (filesystem_android_open_file_read, 1);
 
-static value filesystem_android_delete_file(value str) 
+static value filesystem_android_delete_file(value str)
 {
 	const char *c_str = val_string(str);
 	CHECK_STATIC_FILE_EXIT_FALSE(c_str);
@@ -186,7 +212,7 @@ DEFINE_PRIM (filesystem_android_delete_file, 1);
 /// Done in Java
 ///static value filesystem_android_delete_folder(value str)
 
-static value filesystem_android_url_exists(value str) 
+static value filesystem_android_url_exists(value str)
 {
 	struct stat fileStat;
 	const char *c_str = val_string(str);
@@ -228,7 +254,7 @@ static value filesystem_android_url_exists(value str)
 }
 DEFINE_PRIM (filesystem_android_url_exists, 1);
 
-static value filesystem_android_is_folder(value str) 
+static value filesystem_android_is_folder(value str)
 {
 	struct stat fileStat;
 	const char *c_str = val_string(str);
@@ -267,7 +293,7 @@ static value filesystem_android_is_folder(value str)
 }
 DEFINE_PRIM (filesystem_android_is_folder, 1);
 
-static value filesystem_android_is_file(value str) 
+static value filesystem_android_is_file(value str)
 {
 	struct stat fileStat;
 	const char *c_str = val_string(str);
@@ -305,7 +331,7 @@ DEFINE_PRIM (filesystem_android_is_file, 1);
 /// FILEHANDLE
 /// ======
 
-static value filesystem_android_get_seek(value hxFileHandle) 
+static value filesystem_android_get_seek(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -320,7 +346,7 @@ static value filesystem_android_get_seek(value hxFileHandle)
 }
 DEFINE_PRIM (filesystem_android_get_seek, 1);
 
-static value filesystem_android_set_seek(value hxFileHandle, value seek) 
+static value filesystem_android_set_seek(value hxFileHandle, value seek)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -335,7 +361,7 @@ static value filesystem_android_set_seek(value hxFileHandle, value seek)
 }
 DEFINE_PRIM (filesystem_android_set_seek, 2);
 
-static value filesystem_android_seek_end_of_file(value hxFileHandle) 
+static value filesystem_android_seek_end_of_file(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -351,19 +377,19 @@ static value filesystem_android_seek_end_of_file(value hxFileHandle)
 }
 DEFINE_PRIM (filesystem_android_seek_end_of_file, 1);
 
-static value filesystem_android_file_write(value hxFileHandle, value nativeData) 
+static value filesystem_android_file_write(value hxFileHandle, value nativeData)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	NativeData* ptr = ((NativeData*)val_data(nativeData));
 
-	fwrite(ptr->ptr + ptr->offset, 1, ptr->offsetLength, fileHandle->fileHandle); 
+	fwrite(ptr->ptr + ptr->offset, 1, ptr->offsetLength, fileHandle->fileHandle);
     fflush(fileHandle->fileHandle);
 
 	return alloc_null();
 }
 DEFINE_PRIM (filesystem_android_file_write, 2);
 
-static value filesystem_android_file_read(value hxFileHandle, value nativeData) 
+static value filesystem_android_file_read(value hxFileHandle, value nativeData)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	NativeData* ptr = ((NativeData*)val_data(nativeData));
@@ -374,13 +400,13 @@ static value filesystem_android_file_read(value hxFileHandle, value nativeData)
 	}
 	else
 	{
-		fread(ptr->ptr + ptr->offset, 1, ptr->offsetLength, fileHandle->fileHandle); 
+		fread(ptr->ptr + ptr->offset, 1, ptr->offsetLength, fileHandle->fileHandle);
 	}
 	return alloc_null();
 }
 DEFINE_PRIM (filesystem_android_file_read, 2);
 
-static value filesystem_android_file_close(value hxFileHandle) 
+static value filesystem_android_file_close(value hxFileHandle)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 
@@ -396,9 +422,9 @@ DEFINE_PRIM (filesystem_android_file_close, 1);
 /// OTHER
 /// ======
 extern "C" void filesystem_android_main () {
-	
+
 	val_int(0); // Fix Neko init
-	
+
 }
 DEFINE_ENTRY_POINT (filesystem_android_main);
 
