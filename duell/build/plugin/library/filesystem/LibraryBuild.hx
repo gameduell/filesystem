@@ -160,7 +160,7 @@ class LibraryBuild
 
 	private function addHashOfFolderRecursively(arrayOfHashes: Array<Int>, folder): Void
 	{
-		var hash: Int = DirHashHelper.getHashOfDirectory(folder);
+		var hash: Int = DirHashHelper.getHashOfDirectory(folder, LibraryConfiguration.getData().IGNORE_LIST);
 		arrayOfHashes.push(hash);
 
 		var folderList = PathHelper.getRecursiveFolderListUnderFolder(folder);
