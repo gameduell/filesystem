@@ -85,7 +85,7 @@ class LibraryBuild
 
 		if (Arguments.isDefineSet("forceAssetProcessing") || currentHash != previousHash)
 		{
-			LogHelper.info("", "[Filesystem] Assets changed! reprocessing");
+			LogHelper.info("[Filesystem] Assets changed! reprocessing");
 
 			if (FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
 			{
@@ -186,7 +186,10 @@ class LibraryBuild
 		var folderList = PathHelper.getRecursiveFolderListUnderFolder(folder);
 		for (innerFolder in folderList)
 		{
-			addHashOfFolderRecursively(arrayOfHashes, Path.join([folder, innerFolder]));
+			var hash: Int = DirHashHelper.getHashOfDirectory(
+								Path.join([folder, innerFolder]),
+								LibraryConfiguration.getData().IGNORE_LIST);
+			arrayOfHashes.push(hash);
 		}
 	}
 
