@@ -10,4 +10,10 @@
     <include path="backends/filesystem_ios/duell_library.xml" if="ios" />
     <include path="backends/filesystem_flash/duell_library.xml" if="flash" />
 
+    <platform-config>
+        <documentation>
+            <documentation-folder library="filesystem" path="documentation" />
+        </documentation>
+    </platform-config>
+
 </library>
