@@ -315,4 +315,45 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(!FileSystem.instance().urlExists(testFileURL));
     }
 
+    public function testAppendingToFile()
+    {
+        var testFileURL = testCacheFolder + "/TestFileToAppend.txt";
+
+        FileSystem.instance().deleteFile(testFileURL);
+        assertTrue(FileSystem.instance().createFile(testFileURL));
+
+        /// WRITE
+        var testFileText = "Test File Text!";
+        var inputData : Data = new Data(testFileText.length);
+        inputData.writeString(testFileText);
+        var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
+        fileWrite.writeFromData(inputData);
+        fileWrite.close();
+
+        /// append
+
+        var appendedTestFileText = " Appended Text!";
+
+        var inputData : Data = new Data(appendedTestFileText.length);
+        inputData.writeString(appendedTestFileText);
+        var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
+        fileWrite.seekPosition = fileSize;
+        fileWrite.writeFromData(inputData);
+        fileWrite.close();
+
+        /// READ
+        var fileRead = FileSystem.instance().getFileReader(testFileURL);
+
+        var fileSize = FileSystem.instance().getFileSize(testFileURL);
+        var outputData = new Data(fileSize);
+
+        fileRead.readIntoData(outputData);
+
+        /// COMPARE CONTENT
+        assertEquals(testFileText + appendedTestFileText, outputData.readString());
+
+        fileRead.close();
+    }
+
 }

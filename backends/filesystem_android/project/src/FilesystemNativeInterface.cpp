@@ -120,7 +120,7 @@ static value filesystem_android_open_file_write(value url)
 	const char *c_str = val_string(url);
 	CHECK_STATIC_FILE_EXIT_NULL(c_str);
 
-	FILE *file = fopen(c_str, "w");
+	FILE *file = fopen(c_str, "r+");
 
 	if(!file)
 	{
