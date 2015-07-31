@@ -106,20 +106,38 @@ class FileSystem
         return filteredFiles;
     }
 
-    public function urlToStaticData(): String
-    {
-        return staticDataURL;
-    }
+    private var staticDataURL : String;
+	public function getUrlToStaticData() : String
+	{
+		return staticDataURL;
+	}
+	@:deprecated("urlToStaticData is deprecated. Use FileSystem.getUrlToStaticData() instead!")
+	public function urlToStaticData() : String
+	{
+		return staticDataURL;
+	}
 
-    public function urlToCachedData(): String
-    {
-        return cachedDataURL;
-    }
+	private var cachedDataURL : String;
+	public function getUrlToCachedData() : String
+	{
+		return cachedDataURL;
+	}
+	@:deprecated("urlToCachedData is deprecated. Use FileSystem.getUrlToCachedData() instead!")
+	public function urlToCachedData() : String
+	{
+		return cachedDataURL;
+	}
 
-    public function urlToTempData(): String
-    {
-        return tempDataURL;
-    }
+	private var tempDataURL : String;
+	public function getUrlToTempData() : String
+	{
+		return tempDataURL;
+	}
+	@:deprecated("urlToTempData is deprecated. Use FileSystem.getUrlToTempData() instead!")
+	public function urlToTempData() : String
+	{
+		return tempDataURL;
+	}
 
     public function createFile(url: String): Bool
     {
