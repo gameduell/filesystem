@@ -337,7 +337,7 @@ class FileSystem
             return 0;
         }
 
-        return map[withoutPrefix].offsetLength;
+        return map[withoutPrefix].allocedLength;
     }
 
     public static function preloadStaticAssets(complete: Void -> Void): Void

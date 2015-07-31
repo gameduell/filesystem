@@ -273,7 +273,7 @@ class FileSystem
         if (!map.exists(withoutPrefix))
             return 0;
 
-        return map[withoutPrefix].offsetLength;
+        return map[withoutPrefix].allocedLength;
     }
 
 	/// SINGLETON
