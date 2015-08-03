@@ -106,7 +106,6 @@ class FileSystem
         return filteredFiles;
     }
 
-    private var staticDataURL : String;
 	public function getUrlToStaticData() : String
 	{
 		return staticDataURL;
@@ -117,7 +116,6 @@ class FileSystem
 		return staticDataURL;
 	}
 
-	private var cachedDataURL : String;
 	public function getUrlToCachedData() : String
 	{
 		return cachedDataURL;
@@ -128,7 +126,6 @@ class FileSystem
 		return cachedDataURL;
 	}
 
-	private var tempDataURL : String;
 	public function getUrlToTempData() : String
 	{
 		return tempDataURL;
