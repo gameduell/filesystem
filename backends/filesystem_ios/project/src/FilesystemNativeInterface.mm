@@ -263,9 +263,12 @@ static value filesystem_ios_file_read(value hxFileHandle, value nativeData)
 {
 	FileHandle* fileHandle = ((FileHandle*)val_data(hxFileHandle));
 	NativeData* ptr = ((NativeData*)val_data(nativeData));
-	FILE *file = fdopen([fileHandle->objcFileHandle fileDescriptor], "r");
-
-	fread(ptr->ptr + ptr->offset, 1, ptr->offsetLength, file);
+	
+	size_t s = read([fileHandle->objcFileHandle fileDescriptor], ptr->ptr + ptr->offset, ptr->offsetLength);
+	if ( s != ptr->offsetLength )
+	{
+		NSLog(@"Read failed: %lu bytes instead of %d", s, ptr->offsetLength);
+	}
 
 	return alloc_null();
 }
