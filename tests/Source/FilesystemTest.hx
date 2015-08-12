@@ -357,13 +357,14 @@ class FileSystemTest extends unittest.TestCase
 
     public function testFileSize(): Void
     {
-        var testFileURL = testCacheFolder + "/TestFile.txt";
+        var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFile.txt".urlEncode();
 
         var fileSize: Float = FileSystem.instance().getFileSize(testFileURL);
-        var expectedFileSite: Float = 15;
-        var unexpectedFileSite: Float = 0;
 
-        assertTrue(fileSize == expectedFileSite);
-        assertTrue(fileSize != unexpectedFileSite);
+        var expectedFileSize: Int = 20;
+        var unexpectedFileSize: Int = 0;
+
+        assertTrue(fileSize == expectedFileSize);
+        assertTrue(fileSize != unexpectedFileSize);
     }
 }
