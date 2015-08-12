@@ -24,7 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- import filesystem.FileSystem;
+import filesystem.FileSystem;
 
 import filesystem.StaticAssetList;
 
@@ -35,10 +35,10 @@ using StringTools;
 
 import Date;
 
-class FileSystemTest extends unittest.TestCase {
+class FileSystemTest extends unittest.TestCase
+{
 
-
-    public function new ()
+    public function new()
     {
         super();
 
@@ -55,7 +55,7 @@ class FileSystemTest extends unittest.TestCase {
 
     }
 
-    public function testURLs()
+    public function testURLs(): Void
     {
         var staticURL = FileSystem.instance().urlToStaticData();
         var cachedData = FileSystem.instance().urlToCachedData();
@@ -66,10 +66,10 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(tempData != null && tempData != "");
     }
 
-    private var testCacheFolder : String;
-    private var testTempFolder : String;
+    private var testCacheFolder: String;
+    private var testTempFolder: String;
 
-    public function testCreation()
+    public function testCreation(): Void
     {
         /// CACHED
         var urlCachedFile = testCacheFolder + "/test.txt";
@@ -92,7 +92,8 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
         fileWrite.close();
     }
-    public function testStaticAssetList()
+
+    public function testStaticAssetList(): Void
     {
         var expectedList = [
             "lime.png",
@@ -110,7 +111,7 @@ class FileSystemTest extends unittest.TestCase {
         }
     }
 
-    public function testStaticAssetSubfolderList()
+    public function testStaticAssetSubfolderList(): Void
     {
         var expectedList = [
             "subfolderTestFolder"
@@ -124,7 +125,7 @@ class FileSystemTest extends unittest.TestCase {
         }
     }
 
-    public function testReadFromStatic()
+    public function testReadFromStatic(): Void
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.txt";
 
@@ -148,7 +149,7 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
     }
 
-    public function testWrite()
+    public function testWriteAndRead(): Void
     {
         var testFileURL = testCacheFolder + "/TestFile.txt";
 
@@ -157,7 +158,7 @@ class FileSystemTest extends unittest.TestCase {
 
         /// WRITE
         var testFileText = "Test File Text!";
-        var inputData : Data = new Data(testFileText.length);
+        var inputData: Data = new Data(testFileText.length);
         inputData.writeString(testFileText);
         var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
@@ -181,7 +182,7 @@ class FileSystemTest extends unittest.TestCase {
 
     }
 
-    public function testExistence()
+    public function testExistence(): Void
     {
         var testFolderForCheckingExistence = testCacheFolder + "/testFolderForCheckingExistence";
         var testFileURL = testFolderForCheckingExistence + "/TestFileForExistence.txt";
@@ -209,13 +210,13 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(FileSystem.instance().isFile(testFileURL));
     }
 
-    public function testExistenceStaticFolder()
+    public function testExistenceStaticFolder(): Void
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder/TestFileSub.txt";
         assertTrue(FileSystem.instance().urlExists(testFileURL));
     }
 
-    public function testDelete()
+    public function testDelete(): Void
     {
         var testFolderForDeletion = testCacheFolder + "/testFolderForDeletion";
         assertTrue(FileSystem.instance().createFolder(testFolderForDeletion));
@@ -238,8 +239,7 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(!FileSystem.instance().urlExists(testFolderForDeletion));
     }
 
-
-    public function testReadWeirdCharacterFileFromStatic()
+    public function testReadWeirdCharacterFileFromStatic(): Void
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
 
@@ -262,15 +262,14 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
     }
 
-
-    public function testWriteWeirdCharacterFile()
+    public function testWriteWeirdCharacterFile(): Void
     {
         var testFileURL = testCacheFolder + "/TestFileBadCharacters +~@.txt".urlEncode();
 
         FileSystem.instance().createFile(testFileURL);
 
         var testFileText = "Test File Text!";
-        var inputData : Data = new Data(testFileText.length);
+        var inputData: Data = new Data(testFileText.length);
         inputData.writeString(testFileText);
 
         var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
@@ -293,7 +292,7 @@ class FileSystemTest extends unittest.TestCase {
         fileWrite.close();
     }
 
-    public function testStaticFolderExistence()
+    public function testStaticFolderExistence(): Void
     {
         var existentFolder = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder";
         assertTrue(FileSystem.instance().urlExists(existentFolder));
@@ -306,7 +305,7 @@ class FileSystemTest extends unittest.TestCase {
         assertFalse(FileSystem.instance().isFile(nonExistentFolder));
     }
 
-    public function testExistenceOfIgnoredFiles()
+    public function testExistenceOfIgnoredFiles(): Void
     {
         var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.tobeignored.txt";
         assertTrue(!FileSystem.instance().urlExists(testFileURL));
@@ -315,7 +314,7 @@ class FileSystemTest extends unittest.TestCase {
         assertTrue(!FileSystem.instance().urlExists(testFileURL));
     }
 
-    public function testAppendingToFile()
+    public function testAppendingToFile(): Void
     {
         var testFileURL = testCacheFolder + "/TestFileToAppend.txt";
 
@@ -324,7 +323,7 @@ class FileSystemTest extends unittest.TestCase {
 
         /// WRITE
         var testFileText = "Test File Text!";
-        var inputData : Data = new Data(testFileText.length);
+        var inputData: Data = new Data(testFileText.length);
         inputData.writeString(testFileText);
         var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         fileWrite.writeFromData(inputData);
@@ -334,7 +333,7 @@ class FileSystemTest extends unittest.TestCase {
 
         var appendedTestFileText = " Appended Text!";
 
-        var inputData : Data = new Data(appendedTestFileText.length);
+        var inputData: Data = new Data(appendedTestFileText.length);
         inputData.writeString(appendedTestFileText);
         var fileWrite = FileSystem.instance().getFileWriter(testFileURL);
         var fileSize = FileSystem.instance().getFileSize(testFileURL);
@@ -356,4 +355,15 @@ class FileSystemTest extends unittest.TestCase {
         fileRead.close();
     }
 
+    public function testFileSize(): Void
+    {
+        var testFileURL = testCacheFolder + "/TestFile.txt";
+
+        var fileSize: Float = FileSystem.instance().getFileSize(testFileURL);
+        var expectedFileSite: Float = 15;
+        var unexpectedFileSite: Float = 0;
+
+        assertTrue(fileSize == expectedFileSite);
+        assertTrue(fileSize != unexpectedFileSite);
+    }
 }

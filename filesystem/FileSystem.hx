@@ -28,7 +28,7 @@ package filesystem;
 
 extern class FileSystem
 {
-	private function new() : Void;
+	private function new();
 	public static function initialize(finishedCallback : Void->Void ):Void;
 	public static function instance() : FileSystem;
 
