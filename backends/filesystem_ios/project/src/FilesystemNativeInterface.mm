@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
 #include <hx/CFFI.h>
 #import <Foundation/Foundation.h>
 
@@ -82,6 +83,10 @@ static value filesystem_ios_create_file(value str)
 {
 	NSURL* url = hxstring_to_nsurl(str);
 	bool success = [filemanager createFileAtPath:[url path] contents:nil attributes:nil];
+    if (!success)
+    {
+        NSLog(@"Failed to create file %@: %s", [url path], strerror(errno));
+    }
 	return alloc_bool(success);
 }
 DEFINE_PRIM (filesystem_ios_create_file, 1);
@@ -104,11 +109,12 @@ DEFINE_PRIM (filesystem_ios_create_folder, 1);
 static value filesystem_ios_open_file_write(value url)
 {
 	NSError *error = nil;
-	NSFileHandle *handle = [NSFileHandle fileHandleForWritingToURL:hxstring_to_nsurl(url) error:&error];
+    NSURL* nsurl = hxstring_to_nsurl(url);
+	NSFileHandle *handle = [NSFileHandle fileHandleForWritingToURL:nsurl error:&error];
 
 	if(error)
 	{
-		NSLog(@"Error opening file %@ for write. %@", url, [error localizedDescription]);
+		NSLog(@"Error opening file %@ for write. %@", nsurl, [error localizedDescription]);
 	}
 
 	if(!handle)
