@@ -272,18 +272,17 @@ class LibraryBuild
 			LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 		}
 	}
-	private function removeUnsedFiles(fileListToCopy: Array<String>, targetFolder: String): Void
+	private function removeUnusedFiles(fileListToCopy: Array<String>, targetFolder: String): Void
 	{
 		/// get all the files in the Export folder
 		var fileListFromPreviousBuild = PathHelper.getRecursiveFileListUnderFolder(targetFolder);
 
-		/// remove the old and unneeded files 
+		/// remove the old and unneeded files
 		for (oldFile in fileListFromPreviousBuild)
 		{
-			trace(oldFile, fileListToCopy.indexOf(oldFile));
 			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(Path.join([targetFolder, oldFile])))
 			{
-				LogHelper.info('[FILESYSTEM] Removing unsed file ' + oldFile);
+				LogHelper.info('[FILESYSTEM] Removing unused file ' + oldFile);
 				FileSystem.deleteFile(oldFile);
 			}
 		}
@@ -320,7 +319,7 @@ class LibraryBuild
         	PathHelper.mkdir(targetFolder);
         	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
         }
-		removeUnsedFiles(fileListToCopy, targetFolder);
+		removeUnusedFiles(fileListToCopy, targetFolder);
 	}
 
 	private function postBuildPerPlatform(): Void
@@ -350,7 +349,7 @@ class LibraryBuild
         	PathHelper.mkdir(targetFolder);
         	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([targetDirectory, file]));
         }
-		removeUnsedFiles(fileListToCopy, targetDirectory);
+		removeUnusedFiles(fileListToCopy, targetDirectory);
 	}
 
 	private function postBuildPerPlatform(): Void
@@ -382,6 +381,7 @@ class LibraryBuild
         		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
         	}
         }
+		removeUnusedFiles(fileListToCopy, targetDirectory);
 	}
 
 	private function preBuildPerPlatform(): Void
@@ -419,6 +419,7 @@ class LibraryBuild
 	    		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
 	    	}
 	    }
+		removeUnusedFiles(fileListToCopy, targetDirectory);
 	}
 
 	private function preBuildPerPlatform(): Void
