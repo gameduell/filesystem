@@ -274,6 +274,9 @@ class LibraryBuild
 	}
 	private function removeUnusedFiles(fileListToCopy: Array<String>, targetFolder: String): Void
 	{
+		if (!FileSystem.exists(targetFolder))
+			return;
+
 		/// get all the files in the Export folder
 		var fileListFromPreviousBuild = PathHelper.getRecursiveFileListUnderFolder(targetFolder);
 
