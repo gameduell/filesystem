@@ -76,19 +76,19 @@ class FileSystem
 		return filteredFiles;
 	}
 
-	private var staticDataURL : String;
+	private var staticDataURL : String = "static://";
 	public function getUrlToStaticData() : String
 	{
 		return staticDataURL;
 	}
 
-	private var cachedDataURL : String;
+	private var cachedDataURL : String = "cached://";
 	public function getUrlToCachedData() : String
 	{
 		return cachedDataURL;
 	}
 
-	private var tempDataURL : String;
+	private var tempDataURL : String = "temp://";
 	public function getUrlToTempData() : String
 	{
 		return tempDataURL;
