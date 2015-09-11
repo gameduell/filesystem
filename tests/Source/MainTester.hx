@@ -32,7 +32,7 @@ import unittest.TestRunner;
 
 import FilesystemTest;
 
-import duell.DuellKit;
+import duellkit.DuellKit;
 
 class MainTester
 {
