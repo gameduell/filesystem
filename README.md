@@ -16,6 +16,11 @@ Access them by using the FileSystem class API.
 
 ## Release Log
 
+### 5.0.0
+
+New duell tool version compatibility
+Renamed url methods
+
 ### 4.0.0
 
 New duell tool version compatibility
