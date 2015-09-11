@@ -42,13 +42,13 @@ class FileSystemTest extends unittest.TestCase
     {
         super();
 
-        var staticURL = FileSystem.instance().urlToStaticData();
-        var cachedData = FileSystem.instance().urlToCachedData();
-        var tempData = FileSystem.instance().urlToTempData();
+        var staticURL = FileSystem.instance().getUrlToStaticData();
+        var cachedData = FileSystem.instance().getUrlToCachedData();
+        var tempData = FileSystem.instance().getUrlToTempData();
 
         var testFolder = ("/testFolder " + Date.now().getTime()).urlEncode();
-        testCacheFolder = FileSystem.instance().urlToCachedData() + testFolder;
-        testTempFolder = FileSystem.instance().urlToTempData() + testFolder;
+        testCacheFolder = FileSystem.instance().getUrlToCachedData() + testFolder;
+        testTempFolder = FileSystem.instance().getUrlToTempData() + testFolder;
 
         FileSystem.instance().createFolder(testCacheFolder);
         FileSystem.instance().createFolder(testTempFolder);
@@ -57,9 +57,9 @@ class FileSystemTest extends unittest.TestCase
 
     public function testURLs(): Void
     {
-        var staticURL = FileSystem.instance().urlToStaticData();
-        var cachedData = FileSystem.instance().urlToCachedData();
-        var tempData = FileSystem.instance().urlToTempData();
+        var staticURL = FileSystem.instance().getUrlToStaticData();
+        var cachedData = FileSystem.instance().getUrlToCachedData();
+        var tempData = FileSystem.instance().getUrlToTempData();
 
         assertTrue(staticURL != null && staticURL != "");
         assertTrue(cachedData != null && cachedData != "");
@@ -127,7 +127,7 @@ class FileSystemTest extends unittest.TestCase
 
     public function testReadFromStatic(): Void
     {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.txt";
+        var testFileURL = FileSystem.instance().getUrlToStaticData() + "/TestFile.txt";
 
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
         assertTrue(fileRead != null);
@@ -212,7 +212,7 @@ class FileSystemTest extends unittest.TestCase
 
     public function testExistenceStaticFolder(): Void
     {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder/TestFileSub.txt";
+        var testFileURL = FileSystem.instance().getUrlToStaticData() + "/subfolderTestFolder/TestFileSub.txt";
         assertTrue(FileSystem.instance().urlExists(testFileURL));
     }
 
@@ -241,7 +241,7 @@ class FileSystemTest extends unittest.TestCase
 
     public function testReadWeirdCharacterFileFromStatic(): Void
     {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
+        var testFileURL = FileSystem.instance().getUrlToStaticData() + "/" + "TestFileBadCharacters +~@.txt".urlEncode();
 
         var fileSize = FileSystem.instance().getFileSize(testFileURL);
 
@@ -294,12 +294,12 @@ class FileSystemTest extends unittest.TestCase
 
     public function testStaticFolderExistence(): Void
     {
-        var existentFolder = FileSystem.instance().urlToStaticData() + "/subfolderTestFolder";
+        var existentFolder = FileSystem.instance().getUrlToStaticData() + "/subfolderTestFolder";
         assertTrue(FileSystem.instance().urlExists(existentFolder));
         assertTrue(FileSystem.instance().isFolder(existentFolder));
         assertFalse(FileSystem.instance().isFile(existentFolder));
 
-        var nonExistentFolder = FileSystem.instance().urlToStaticData() + "/nope";
+        var nonExistentFolder = FileSystem.instance().getUrlToStaticData() + "/nope";
         assertFalse(FileSystem.instance().urlExists(nonExistentFolder));
         assertFalse(FileSystem.instance().isFolder(nonExistentFolder));
         assertFalse(FileSystem.instance().isFile(nonExistentFolder));
@@ -307,10 +307,10 @@ class FileSystemTest extends unittest.TestCase
 
     public function testExistenceOfIgnoredFiles(): Void
     {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile.tobeignored.txt";
+        var testFileURL = FileSystem.instance().getUrlToStaticData() + "/TestFile.tobeignored.txt";
         assertTrue(!FileSystem.instance().urlExists(testFileURL));
 
-        testFileURL = FileSystem.instance().urlToStaticData() + "/TestFile2.ToBeIgnored.txt";
+        testFileURL = FileSystem.instance().getUrlToStaticData() + "/TestFile2.ToBeIgnored.txt";
         assertTrue(!FileSystem.instance().urlExists(testFileURL));
     }
 
@@ -357,7 +357,7 @@ class FileSystemTest extends unittest.TestCase
 
     public function testFileSize(): Void
     {
-        var testFileURL = FileSystem.instance().urlToStaticData() + "/" + "TestFile.txt".urlEncode();
+        var testFileURL = FileSystem.instance().getUrlToStaticData() + "/" + "TestFile.txt".urlEncode();
 
         var fileSize: Float = FileSystem.instance().getFileSize(testFileURL);
 

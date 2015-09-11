@@ -35,10 +35,6 @@ extern class FileSystem
 	public function getUrlToStaticData() : String;
 	public function getUrlToCachedData() : String;
 	public function getUrlToTempData() : String;
-	/// deprecated 
-	public function urlToStaticData() : String;
-	public function urlToCachedData() : String;
-	public function urlToTempData() : String;
 
 	public function getFileWriter(url : String) : FileWriter;
 	public function getFileReader(url : String) : FileReader;
