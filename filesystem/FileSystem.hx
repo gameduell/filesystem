@@ -32,6 +32,10 @@ extern class FileSystem
 	public static function initialize(finishedCallback : Void->Void ):Void;
 	public static function instance() : FileSystem;
 
+	public function getUrlToStaticData() : String;
+	public function getUrlToCachedData() : String;
+	public function getUrlToTempData() : String;
+	/// deprecated 
 	public function urlToStaticData() : String;
 	public function urlToCachedData() : String;
 	public function urlToTempData() : String;
