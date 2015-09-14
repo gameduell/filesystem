@@ -283,10 +283,11 @@ class LibraryBuild
 		/// remove the old and unneeded files
 		for (oldFile in fileListFromPreviousBuild)
 		{
-			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(Path.join([targetFolder, oldFile])))
+			var fullPath = Path.join([targetFolder, oldFile]);
+			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(fullPath))
 			{
 				LogHelper.info('[FILESYSTEM] Removing unused file ' + oldFile);
-				FileSystem.deleteFile(oldFile);
+				FileSystem.deleteFile(fullPath);
 			}
 		}
 	}
