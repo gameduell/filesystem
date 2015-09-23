@@ -1,28 +1,28 @@
 /*
- * Copyright (c) 2003-2015, GameDuell GmbH
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+* Copyright (c) 2003-2015, GameDuell GmbH
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+*
+* 2. Redistributions in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 package filesystem;
 
@@ -69,7 +69,7 @@ class FileSystem
 			if(file.startsWith(url))
 			{
 				if(recursive || file.substr(url.length).indexOf("/") == -1)
-					filteredFiles.push(staticDataURL + file);
+				filteredFiles.push(staticDataURL + file);
 			}
 		}
 
@@ -99,17 +99,17 @@ class FileSystem
 	public function createFile(url : String) : Bool
 	{
 		if(url.startsWith(staticDataURL))
-			return false;
+		return false;
 
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return false;
+		return false;
 
 		var withoutPrefix = trimURLPrefix(url);
 
 		if(map.exists(withoutPrefix))
-			return false;
+		return false;
 
 		map[withoutPrefix] = new Data(0);
 		return true;
@@ -118,20 +118,20 @@ class FileSystem
 	public function getFileWriter(url : String) : FileWriter
 	{
 		if(url.startsWith(staticDataURL))
-			return null;
+		return null;
 
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return null;
+		return null;
 
 		var withoutPrefix = trimURLPrefix(url);
 		if(!map.exists(withoutPrefix))
-			return null;
+		return null;
 
 		var data = map[withoutPrefix];
 		if(data == null) /// folder
-			return null;
+		return null;
 
 		return new FileWriter(data);
 	}
@@ -143,14 +143,14 @@ class FileSystem
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return null;
+		return null;
 
 		if(!map.exists(withoutPrefix))
-			return null;
+		return null;
 
 		var data = map[withoutPrefix];
 		if(data == null) /// folder
-			return null;
+		return null;
 
 		return new FileReader(data);
 	}
@@ -158,17 +158,17 @@ class FileSystem
 	public function createFolder(url : String) : Bool
 	{
 		if(url.startsWith(staticDataURL))
-			return false;
+		return false;
 
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return false;
+		return false;
 
 		var withoutPrefix = trimURLPrefix(url);
 
 		if(map.exists(withoutPrefix))
-			return false;
+		return false;
 
 		map[withoutPrefix] = null;
 		return true;
@@ -179,7 +179,7 @@ class FileSystem
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return;
+		return;
 
 		var withoutPrefix = trimURLPrefix(url);
 		map.remove(withoutPrefix);
@@ -191,7 +191,7 @@ class FileSystem
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return;
+		return;
 
 		var withoutPrefix = trimURLPrefix(url);
 
@@ -199,7 +199,7 @@ class FileSystem
 		for(key in map.keys())
 		{
 			if(key.startsWith(withoutPrefix))
-				toRemove.push(key);
+			toRemove.push(key);
 		}
 
 		for(key in toRemove)
@@ -211,87 +211,87 @@ class FileSystem
 
 	public function urlExists(url : String) : Bool
 	{
-        if (isFolder(url))
-        {
-            return true;
-        }
+		if (isFolder(url))
+		{
+			return true;
+		}
 
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return false;
+		return false;
 
 		var withoutPrefix = trimURLPrefix(url);
 		return map.exists(withoutPrefix);
 	}
 
-    public function isFolder(url: String): Bool
-    {
-        var map = getDataDictionaryBasedOnPrefix(url);
+	public function isFolder(url: String): Bool
+	{
+		var map = getDataDictionaryBasedOnPrefix(url);
 
-        var withoutPrefix = trimURLPrefix(url);
+		var withoutPrefix = trimURLPrefix(url);
 
-        if (map == staticData)
-        {
-            // we're working on static data
-            if (StaticAssetList.folders.indexOf(withoutPrefix) != -1)
-            {
-                return true;
-            }
-        }
-        else if (map != null)
-        {
-            if (map.exists(withoutPrefix) && map[withoutPrefix] == null)
-            {
-                return true;
-            }
-        }
+		if (map == staticData)
+		{
+			// we're working on static data
+			if (StaticAssetList.folders.indexOf(withoutPrefix) != -1)
+			{
+				return true;
+			}
+		}
+		else if (map != null)
+		{
+			if (map.exists(withoutPrefix) && map[withoutPrefix] == null)
+			{
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	public function isFile(url : String) : Bool
 	{
 		var map = getDataDictionaryBasedOnPrefix(url);
 
 		if(map == null)
-			return false;
+		return false;
 
 		var withoutPrefix = trimURLPrefix(url);
 		return map.exists(withoutPrefix) && map[withoutPrefix] != null;
 	}
 
-    public function getFileSize(url : String) : Int
-    {
-        var map = getDataDictionaryBasedOnPrefix(url);
+	public function getFileSize(url : String) : Int
+	{
+		var map = getDataDictionaryBasedOnPrefix(url);
 
-        if(map == null)
-            return 0;
+		if(map == null)
+		return 0;
 
-        var withoutPrefix = trimURLPrefix(url);
+		var withoutPrefix = trimURLPrefix(url);
 
-        if (!map.exists(withoutPrefix))
-            return 0;
+		if (!map.exists(withoutPrefix))
+		return 0;
 
-        return map[withoutPrefix].allocedLength;
-    }
+		return map[withoutPrefix].allocedLength;
+	}
 
 	/// SINGLETON
-    static var fileSystemInstance : FileSystem;
-    static public inline function instance() : FileSystem
-    {
-        return fileSystemInstance;
-    }
+	static var fileSystemInstance : FileSystem;
+	static public inline function instance() : FileSystem
+	{
+		return fileSystemInstance;
+	}
 
-    public static function initialize(finishedCallback : Void -> Void):Void
-    {
+	public static function initialize(finishedCallback : Void -> Void):Void
+	{
 
-        if(fileSystemInstance == null)
-        {
-            fileSystemInstance = new FileSystem();
-        }
-        preloadStaticAssets(finishedCallback);
-    }
+		if(fileSystemInstance == null)
+		{
+			fileSystemInstance = new FileSystem();
+		}
+		preloadStaticAssets(finishedCallback);
+	}
 
 	static private var requestsLeft : Int;
 	public static function preloadStaticAssets(complete : Void -> Void) : Void
@@ -299,20 +299,20 @@ class FileSystem
 
 		if(filesystem.StaticAssetList.list.length == 0)
 		{
-		  complete();
-		  return;
+			complete();
+			return;
 		}
 
 		requestsLeft = 0;
 
-	    function encodeURLElement(element:String) : String
-	    {
-	        return element.urlEncode();
-	    }
+		function encodeURLElement(element:String) : String
+		{
+			return element.urlEncode();
+		}
 
-	    function checkIfAvailableInResourcesAndAddtoFilesystem(fileName: String): Bool
-	    {
-	    	var haxeBytes = haxe.Resource.getBytes(fileName);
+		function checkIfAvailableInResourcesAndAddtoFilesystem(fileName: String): Bool
+		{
+			var haxeBytes = haxe.Resource.getBytes(fileName);
 			if(haxeBytes == null)
 			{
 				return false;
@@ -322,55 +322,56 @@ class FileSystem
 			FileSystem.instance().staticData[correctedUrl] = data;
 			haxeBytes = null;
 			return true;
-	    }
+		}
 
 		for(val in filesystem.StaticAssetList.list)
 		{
-		  if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
-		  {
-		  	if(requestsLeft == 0)
-		      {
-		        complete();
-		      }
-		  	continue;
-		  }
-		  requestsLeft += 1;
-		  var valWithAssets = getBaseURL()+"assets/"+val;
-		  valWithAssets.split("/").map(encodeURLElement).join("/");
+			if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
+			{
+				continue;
+			}
+			requestsLeft += 1;
+			var valWithAssets = getBaseURL()+"assets/"+val;
+			valWithAssets.split("/").map(encodeURLElement).join("/");
 
-		  var oReq = new XMLHttpRequest();
-		  oReq.open("GET", valWithAssets, true);
-		  oReq.responseType = js.html.XMLHttpRequestResponseType.ARRAYBUFFER;
+			var oReq = new XMLHttpRequest();
+			oReq.open("GET", valWithAssets, true);
+			oReq.responseType = js.html.XMLHttpRequestResponseType.ARRAYBUFFER;
 
-		  oReq.onload = function (oEvent)
-		  {
-		    requestsLeft -= 1;
-		      var arrayBuffer = oReq.response;
-		      var data = new Data(0);
-		      data.arrayBuffer = arrayBuffer;
+			oReq.onload = function (oEvent)
+			{
+				requestsLeft -= 1;
+				var arrayBuffer = oReq.response;
+				var data = new Data(0);
+				data.arrayBuffer = arrayBuffer;
 
-		    var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
+				var correctedUrl: String = val.split("/").map(StringTools.urlEncode).join("/");
 
-		      FileSystem.instance().staticData[correctedUrl] = data;
+				FileSystem.instance().staticData[correctedUrl] = data;
 
-		      if(requestsLeft == 0)
-		      {
-		        complete();
-		      }
-		  };
+				if(requestsLeft == 0)
+				{
+					complete();
+				}
+			};
 
-		  oReq.send(null);
+			oReq.send(null);
+		}
+
+		if(requestsLeft == 0)
+		{
+			complete();
 		}
 	}
 
 	public static function getBaseURL()
 	{
-			var location: js.html.Location =  js.Browser.location;
-		    var url = location.href;  // entire url including querystring - also: window.location.href;
-		    var baseURL = url.substring(0, url.indexOf('/', 14));
+		var location: js.html.Location =  js.Browser.location;
+		var url = location.href;  // entire url including querystring - also: window.location.href;
+		var baseURL = url.substring(0, url.indexOf('/', 14));
 
-	        // Root Url for domain name
-	        return baseURL + "/";
+		// Root Url for domain name
+		return baseURL + "/";
 
 	}
 	public function getData(url:String): Data
@@ -398,7 +399,7 @@ class FileSystem
 	{
 		var withoutPrefix = url.substr(url.indexOf(":") + 1);
 		while(withoutPrefix.startsWith("/"))
-			withoutPrefix = withoutPrefix.substr(1);
+		withoutPrefix = withoutPrefix.substr(1);
 		return withoutPrefix;
 	}
 
