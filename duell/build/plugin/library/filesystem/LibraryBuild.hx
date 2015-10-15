@@ -331,7 +331,46 @@ class LibraryBuild
 
 	}
 
-	#elseif platform_android
+	#elseif platform_tvos
+
+    private function postParsePerPlatform(): Void
+    {
+/// ADD ASSET FOLDER TO THE XCODE
+        var assetFolderID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
+        var fileID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
+        PlatformConfiguration.getData().ADDL_PBX_BUILD_FILE.push('      ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */ = {isa = PBXBuildFile; fileRef = ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */; };');
+        PlatformConfiguration.getData().ADDL_PBX_FILE_REFERENCE.push('      ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */ = {isa = PBXFileReference; lastKnownFileType = folder; name = $INTERNAL_ASSET_FOLDER; path = ' + Configuration.getData().APP.FILE + '/$INTERNAL_ASSET_FOLDER; sourceTree = \"<group>\"; };');
+        PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push('            ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */,');
+        PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push('            ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */,');
+    }
+
+    private function postPostParsePerPlatform():Void
+    {
+    }
+    private function preBuildPerPlatform()
+    {
+        var targetDirectory = Path.join([Configuration.getData().OUTPUT, "tvos"]);
+        var projectDirectory = Path.join([targetDirectory, Configuration.getData().APP.FILE]);
+
+        var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
+        PathHelper.mkdir(targetFolder);
+
+        var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
+        for (file in fileListToCopy)
+        {
+            var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file)]);
+            PathHelper.mkdir(targetFolder);
+            FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
+        }
+        removeUnusedFiles(fileListToCopy, targetFolder);
+    }
+
+    private function postBuildPerPlatform(): Void
+    {
+
+    }
+
+    #elseif platform_android
 
 	private function postParsePerPlatform(): Void
 	{
