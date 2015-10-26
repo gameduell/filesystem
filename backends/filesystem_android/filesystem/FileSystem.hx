@@ -35,11 +35,11 @@ using StringTools;
 class FileSystem
 {
 
-	private var filesystem_android_init = Lib.load("filesystemandroid", "filesystem_android_init", 0);
+	private static var filesystem_android_init = Lib.load("filesystemandroid", "filesystem_android_init", 0);
 
-	private var j_initialize = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "initialize", "(Lorg/haxe/duell/hxjni/HaxeObject;)V");
-	private var j_getCachedDataURL = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "getCachedDataURL", "()Ljava/lang/String;");
-	private var j_getTempDataURL = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "getTempDataURL", "()Ljava/lang/String;");
+	private static var j_initialize = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "initialize", "(Lorg/haxe/duell/hxjni/HaxeObject;)V");
+	private static var j_getCachedDataURL = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "getCachedDataURL", "()Ljava/lang/String;");
+	private static var j_getTempDataURL = JNI.createStaticMethod("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "getTempDataURL", "()Ljava/lang/String;");
 	private function new() : Void
 	{
 		filesystem_android_init();
@@ -70,14 +70,14 @@ class FileSystem
 		return tempDataURL;
 	}
 
-	private var filesystem_android_create_file = Lib.load ("filesystemandroid", "filesystem_android_create_file", 1);
+	private static var filesystem_android_create_file = Lib.load ("filesystemandroid", "filesystem_android_create_file", 1);
 	public function createFile(url : String) : Bool
 	{
 		var path = url.urlDecode();
 		return filesystem_android_create_file(path);
 	}
 
-	private var filesystem_android_open_file_write = Lib.load ("filesystemandroid", "filesystem_android_open_file_write", 1);
+	private static var filesystem_android_open_file_write = Lib.load ("filesystemandroid", "filesystem_android_open_file_write", 1);
 	public function getFileWriter(url : String) : FileWriter
 	{
 		var path = url.urlDecode();
@@ -90,7 +90,7 @@ class FileSystem
 		return file;
 	}
 
-	private var filesystem_android_open_file_read = Lib.load ("filesystemandroid", "filesystem_android_open_file_read", 1);
+	private static var filesystem_android_open_file_read = Lib.load ("filesystemandroid", "filesystem_android_open_file_read", 1);
 	public function getFileReader(url : String) : FileReader
 	{
 		var path = url.urlDecode();
@@ -103,51 +103,51 @@ class FileSystem
 		return file;
 	}
 
-	private var filesystem_android_create_folder = Lib.load ("filesystemandroid", "filesystem_android_create_folder", 1);
+	private static var filesystem_android_create_folder = Lib.load ("filesystemandroid", "filesystem_android_create_folder", 1);
 	public function createFolder(url : String) : Bool
 	{
 		var path = url.urlDecode();
 		return filesystem_android_create_folder(path);
 	}
 
-	private var filesystem_android_delete_file = Lib.load ("filesystemandroid", "filesystem_android_delete_file", 1);
+	private static var filesystem_android_delete_file = Lib.load ("filesystemandroid", "filesystem_android_delete_file", 1);
 	public function deleteFile(url : String) : Void
 	{
 		var path = url.urlDecode();
 		return filesystem_android_delete_file(path);
 	}
 
-	private var j_deleteFolderRecursively = JNI.createStaticMethod ("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "deleteFolderRecursively", "(Ljava/lang/String;)V");
+	private static var j_deleteFolderRecursively = JNI.createStaticMethod ("org/haxe/duell/filesystem/DuellFileSystemActivityExtension", "deleteFolderRecursively", "(Ljava/lang/String;)V");
 	public function deleteFolder(url : String) : Void
 	{
 		/// there is no easy way to this in c
 		return j_deleteFolderRecursively(url);
 	}
 
-	private var filesystem_android_url_exists = Lib.load ("filesystemandroid", "filesystem_android_url_exists", 1);
+	private static var filesystem_android_url_exists = Lib.load ("filesystemandroid", "filesystem_android_url_exists", 1);
 	public function urlExists(url : String) : Bool
 	{
 		var path = url.urlDecode();
 		return filesystem_android_url_exists(path);
 	}
 
-	private var filesystem_android_is_folder = Lib.load ("filesystemandroid", "filesystem_android_is_folder", 1);
+	private static var filesystem_android_is_folder = Lib.load ("filesystemandroid", "filesystem_android_is_folder", 1);
 	public function isFolder(url : String) : Bool
 	{
 		var path = url.urlDecode();
 		return filesystem_android_is_folder(path);
 	}
 
-	private var filesystem_android_is_file = Lib.load ("filesystemandroid", "filesystem_android_is_file", 1);
+	private static var filesystem_android_is_file = Lib.load ("filesystemandroid", "filesystem_android_is_file", 1);
 	public function isFile(url : String) : Bool
 	{
 		var path = url.urlDecode();
 		return filesystem_android_is_file(path);
 	}
 
-	private var filesystem_android_seek_end_of_file = Lib.load ("filesystemandroid", "filesystem_android_seek_end_of_file", 1);
-	private var filesystem_android_get_seek = Lib.load ("filesystemandroid", "filesystem_android_get_seek", 1);
-	private var filesystem_android_file_close = Lib.load ("filesystemandroid", "filesystem_android_file_close", 1);
+	private static var filesystem_android_seek_end_of_file = Lib.load ("filesystemandroid", "filesystem_android_seek_end_of_file", 1);
+	private static var filesystem_android_get_seek = Lib.load ("filesystemandroid", "filesystem_android_get_seek", 1);
+	private static var filesystem_android_file_close = Lib.load ("filesystemandroid", "filesystem_android_file_close", 1);
 	public function getFileSize(url : String) : Int
 	{
 		var path = url.urlDecode();

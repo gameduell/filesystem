@@ -35,13 +35,13 @@ class FileReader
 
 	public var seekPosition (get, set) : Int;
 
-	private var filesystem_ios_get_seek = Lib.load ("filesystem_ios", "filesystem_ios_get_seek", 1);
+	private static var filesystem_ios_get_seek = Lib.load ("filesystem_ios", "filesystem_ios_get_seek", 1);
 	public function get_seekPosition () : Int
 	{
 		return filesystem_ios_get_seek(nativeFileHandle);
 	}
 
-	private var filesystem_ios_set_seek = Lib.load ("filesystem_ios", "filesystem_ios_set_seek", 2);
+	private static var filesystem_ios_set_seek = Lib.load ("filesystem_ios", "filesystem_ios_set_seek", 2);
 	public function set_seekPosition (val : Int) : Int
 	{
 		return filesystem_ios_set_seek(nativeFileHandle, val);
@@ -53,13 +53,13 @@ class FileReader
 		this.nativeFileHandle = nativeFileHandle;
 	};
 
-	private var filesystem_ios_file_read = Lib.load ("filesystem_ios", "filesystem_ios_file_read", 2);
+	private static var filesystem_ios_file_read = Lib.load ("filesystem_ios", "filesystem_ios_file_read", 2);
 	public function readIntoData(data : Data)
 	{
 		filesystem_ios_file_read(nativeFileHandle, data.nativeData);
 	}
 
-	private var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);
+	private static var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);
 	public function close()
 	{
 		filesystem_ios_file_close(nativeFileHandle);
