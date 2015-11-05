@@ -344,7 +344,13 @@ class LibraryBuild
 	{
 
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE, "assets"]);
+
+		/// backwards compatibility with ant build android
+		if (!FileSystem.exists(targetDirectory))
+		{
+			targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
+		}
 
 		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
