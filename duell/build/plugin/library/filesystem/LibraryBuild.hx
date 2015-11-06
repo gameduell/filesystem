@@ -342,12 +342,12 @@ class LibraryBuild
 
 	private function preBuildPerPlatform(): Void
 	{
-
+		var projectDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE]);
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE, "assets"]);
+		var targetDirectory = Path.join([projectDirectory, "assets"]);
 
 		/// backwards compatibility with ant build android
-		if (!FileSystem.exists(targetDirectory))
+		if (!FileSystem.exists(projectDirectory))
 		{
 			targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
 		}
