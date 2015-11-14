@@ -29,10 +29,10 @@ import cpp.Lib;
 
 class FileSystem
 {
-	private var filesystem_ios_init = Lib.load ("filesystems_ios", "filesystem_ios_init", 0);
-	private var filesystem_ios_get_url_to_static_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_static_data", 0);
-	private var filesystem_ios_get_url_to_cached_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_cached_data", 0);
-	private var filesystem_ios_get_url_to_temp_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_temp_data", 0);
+	private static var filesystem_ios_init = Lib.load ("filesystems_ios", "filesystem_ios_init", 0);
+	private static var filesystem_ios_get_url_to_static_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_static_data", 0);
+	private static var filesystem_ios_get_url_to_cached_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_cached_data", 0);
+	private static var filesystem_ios_get_url_to_temp_data = Lib.load ("filesystem_ios", "filesystem_ios_get_url_to_temp_data", 0);
 	private function new() : Void
 	{
 		filesystem_ios_init();
@@ -61,13 +61,13 @@ class FileSystem
 		return tempDataURL;
 	}
 
-	private var filesystem_ios_create_file = Lib.load ("filesystem_ios", "filesystem_ios_create_file", 1);
+	private static var filesystem_ios_create_file = Lib.load ("filesystem_ios", "filesystem_ios_create_file", 1);
 	public function createFile(url : String) : Bool
 	{
 		return filesystem_ios_create_file(url);
 	}
 
-	private var filesystem_ios_open_file_write = Lib.load ("filesystem_ios", "filesystem_ios_open_file_write", 1);
+	private static var filesystem_ios_open_file_write = Lib.load ("filesystem_ios", "filesystem_ios_open_file_write", 1);
 	public function getFileWriter(url : String) : FileWriter
 	{
 		var nativeHandle = filesystem_ios_open_file_write(url);
@@ -79,7 +79,7 @@ class FileSystem
 		return file;
 	}
 
-	private var filesystem_ios_open_file_read = Lib.load ("filesystem_ios", "filesystem_ios_open_file_read", 1);
+	private static var filesystem_ios_open_file_read = Lib.load ("filesystem_ios", "filesystem_ios_open_file_read", 1);
 	public function getFileReader(url : String) : FileReader
 	{
 		var nativeHandle = filesystem_ios_open_file_read(url);
@@ -91,45 +91,45 @@ class FileSystem
 		return file;
 	}
 
-	private var filesystem_ios_create_folder = Lib.load ("filesystem_ios", "filesystem_ios_create_folder", 1);
+	private static var filesystem_ios_create_folder = Lib.load ("filesystem_ios", "filesystem_ios_create_folder", 1);
 	public function createFolder(url : String) : Bool
 	{
 		return filesystem_ios_create_folder(url);
 	}
 
-	private var filesystem_ios_delete_file = Lib.load ("filesystem_ios", "filesystem_ios_delete_file", 1);
+	private static var filesystem_ios_delete_file = Lib.load ("filesystem_ios", "filesystem_ios_delete_file", 1);
 	public function deleteFile(url : String) : Void
 	{
 		return filesystem_ios_delete_file(url);
 	}
 
-	private var filesystem_ios_delete_folder = Lib.load ("filesystem_ios", "filesystem_ios_delete_folder", 1);
+	private static var filesystem_ios_delete_folder = Lib.load ("filesystem_ios", "filesystem_ios_delete_folder", 1);
 	public function deleteFolder(url : String) : Void
 	{
 		return filesystem_ios_delete_folder(url);
 	}
 
-	private var filesystem_ios_url_exists = Lib.load ("filesystem_ios", "filesystem_ios_url_exists", 1);
+	private static var filesystem_ios_url_exists = Lib.load ("filesystem_ios", "filesystem_ios_url_exists", 1);
 	public function urlExists(url : String) : Bool
 	{
 		return filesystem_ios_url_exists(url);
 	}
 
-	private var filesystem_ios_is_folder = Lib.load ("filesystem_ios", "filesystem_ios_is_folder", 1);
+	private static var filesystem_ios_is_folder = Lib.load ("filesystem_ios", "filesystem_ios_is_folder", 1);
 	public function isFolder(url : String) : Bool
 	{
 		return filesystem_ios_is_folder(url);
 	}
 
-	private var filesystem_ios_is_file = Lib.load ("filesystem_ios", "filesystem_ios_is_file", 1);
+	private static var filesystem_ios_is_file = Lib.load ("filesystem_ios", "filesystem_ios_is_file", 1);
 	public function isFile(url : String) : Bool
 	{
 		return filesystem_ios_is_file(url);
 	}
 
-	private var filesystem_ios_seek_end_of_file = Lib.load ("filesystem_ios", "filesystem_ios_seek_end_of_file", 1);
-	private var filesystem_ios_get_seek = Lib.load ("filesystem_ios", "filesystem_ios_get_seek", 1);
-	private var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);
+	private static var filesystem_ios_seek_end_of_file = Lib.load ("filesystem_ios", "filesystem_ios_seek_end_of_file", 1);
+	private static var filesystem_ios_get_seek = Lib.load ("filesystem_ios", "filesystem_ios_get_seek", 1);
+	private static var filesystem_ios_file_close = Lib.load ("filesystem_ios", "filesystem_ios_file_close", 1);
 	public function getFileSize(url : String) : Int
 	{
 		var nativeHandle = filesystem_ios_open_file_read(url);
