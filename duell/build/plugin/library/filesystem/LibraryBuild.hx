@@ -100,6 +100,8 @@ class LibraryBuild
 
 			processFiles();
 
+			cleanUpIgnoredFiles();
+
 			saveHash(currentHash);
 		}
 		else
