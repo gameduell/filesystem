@@ -7,7 +7,7 @@
 
     <include path="backends/filesystem_html5/duell_library.xml" if="html5" />
     <include path="backends/filesystem_android/duell_library.xml" if="android" />
-    <include path="backends/filesystem_ios/duell_library.xml" if="ios" />
+    <include path="backends/filesystem_ios/duell_library.xml" if="apple" />
     <include path="backends/filesystem_flash/duell_library.xml" if="flash" />
 
     <platform-config>
