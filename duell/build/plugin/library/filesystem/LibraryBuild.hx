@@ -87,20 +87,11 @@ class LibraryBuild
 		{
 			LogHelper.info("[Filesystem] Assets changed! reprocessing");
 
-			if (FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
-			{
-				PathHelper.removeDirectory(AssetProcessorRegister.pathToTemporaryAssetArea);
-			}
-
-			PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
-
 			copyFilesToStagingArea();
 
 			cleanUpIgnoredFiles();
 
 			processFiles();
-
-			cleanUpIgnoredFiles();
 
 			saveHash(currentHash);
 		}
@@ -182,17 +173,8 @@ class LibraryBuild
 
 	private function addHashOfFolderRecursively(arrayOfHashes: Array<Int>, folder): Void
 	{
-		var hash: Int = DirHashHelper.getHashOfDirectory(folder, LibraryConfiguration.getData().IGNORE_LIST);
+		var hash: Int = DirHashHelper.getHashOfDirectoryRecursively(folder, LibraryConfiguration.getData().IGNORE_LIST);
 		arrayOfHashes.push(hash);
-
-		var folderList = PathHelper.getRecursiveFolderListUnderFolder(folder);
-		for (innerFolder in folderList)
-		{
-			var hash: Int = DirHashHelper.getHashOfDirectory(
-								Path.join([folder, innerFolder]),
-								LibraryConfiguration.getData().IGNORE_LIST);
-			arrayOfHashes.push(hash);
-		}
 	}
 
 	private function getCachedHash(): Int
@@ -226,12 +208,19 @@ class LibraryBuild
 
 	private function copyFilesToStagingArea(): Void
 	{
+		if (FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
+		{
+			PathHelper.removeDirectory(AssetProcessorRegister.pathToTemporaryAssetArea);
+		}
+
+		PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
+
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
 			if(folder == null)
 				return;
 
-			FileHelper.recursiveCopyFiles(folder, AssetProcessorRegister.pathToTemporaryAssetArea);
+			FileHelper.recursiveCopyFiles(folder, AssetProcessorRegister.pathToTemporaryAssetArea, true, true);
 		}
 	}
 
@@ -285,11 +274,10 @@ class LibraryBuild
 		/// remove the old and unneeded files
 		for (oldFile in fileListFromPreviousBuild)
 		{
-			var fullPath = Path.join([targetFolder, oldFile]);
-			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(fullPath))
+			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(Path.join([targetFolder, oldFile])))
 			{
 				LogHelper.info('[FILESYSTEM] Removing unused file ' + oldFile);
-				FileSystem.deleteFile(fullPath);
+				FileSystem.deleteFile(oldFile);
 			}
 		}
 	}
@@ -344,15 +332,9 @@ class LibraryBuild
 
 	private function preBuildPerPlatform(): Void
 	{
-		var projectDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE]);
-		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-		var targetDirectory = Path.join([projectDirectory, "assets"]);
 
-		/// backwards compatibility with ant build android
-		if (!FileSystem.exists(projectDirectory))
-		{
-			targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
-		}
+		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
 
 		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
@@ -377,23 +359,36 @@ class LibraryBuild
 	{
 		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web", INTERNAL_ASSET_FOLDER]);
 
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
+		if (LibraryConfiguration.getData().EMBED_ASSETS)
+		{
+			var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 
-        for (file in fileListToCopy)
-        {
-			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-        	PathHelper.mkdir(Path.directory(destPath));
-        	FileHelper.copyIfNewer(origPath, destPath);
+	        for (file in fileListToCopy)
+	        {
+				var destPath = Path.join([targetDirectory, file]);
+				var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
+	        	PathHelper.mkdir(Path.directory(destPath));
+	        	FileHelper.copyIfNewer(origPath, destPath);
 
-        	/// Add files as resources to haxe arguments
-        	if(LibraryConfiguration.getData().EMBED_ASSETS)
-        	{
-				LogHelper.info('[FILESYSTEM] Embedding html5 asset ' + destPath + "@" + file);
-        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
-        	}
-        }
-		removeUnusedFiles(fileListToCopy, targetDirectory);
+	        	/// Add files as resources to haxe arguments
+	        	if(LibraryConfiguration.getData().EMBED_ASSETS)
+	        	{
+					LogHelper.info('[FILESYSTEM] Embedding html5 asset ' + destPath + "@" + file);
+	        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
+	        	}
+	        }
+		}
+		else
+		{
+			if (FileSystem.exists(targetDirectory))
+			{
+				PathHelper.removeDirectory(targetDirectory);
+			}
+
+			PathHelper.mkdir(targetDirectory);
+
+			FileHelper.recursiveCopyFiles(targetDirectory, AssetProcessorRegister.pathToTemporaryAssetArea, true, true);
+		}
 	}
 
 	private function preBuildPerPlatform(): Void
