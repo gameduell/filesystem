@@ -38,6 +38,7 @@ import duell.helpers.LogHelper;
 import duell.helpers.DirHashHelper;
 import duell.objects.Arguments;
 
+import haxe.Json;
 import sys.FileSystem;
 import sys.io.File;
 
@@ -49,12 +50,34 @@ using StringTools;
 
 import haxe.io.Path;
 
+typedef FileSystemHash = {
+	PROCESSOR_HASH: Int,
+	FOLDER_HASHES: Map<String, FolderHash>,
+	HASH_VERSION: Int
+}
+
+typedef FolderHash = {
+	FOLDER: String, /// relative to staging
+	HASH: Int,
+	ASSET_FOLDER: String /// path to the configured asset folder
+}
+
 @:access(duell.build.plugin.library.filesystem.AssetProcessorRegister)
 class LibraryBuild
 {
 	private static inline var INTERNAL_ASSET_FOLDER = "assets";
+	private static inline var HASH_VERSION = 1;
 
 	private var hashPath: String;
+
+	private var hash: FileSystemHash;
+	private var previousHash: FileSystemHash;
+
+	private var foldersThatChanged: Array<FolderHash> = [];
+
+	private var previousProcessorHash: String = "";
+
+	private var fullReset: Bool = false;
 
 	public function new () {}
 
@@ -79,21 +102,25 @@ class LibraryBuild
 	{
 		generateVariables();
 
-		var currentHash = generateCurrentHash();
+		generateCurrentHash();
 
-		var previousHash = getCachedHash();
+		getCachedHash();
 
-		if (Arguments.isDefineSet("forceAssetProcessing") || currentHash != previousHash)
+		compareHashes();
+
+		if (Arguments.isDefineSet("forceAssetProcessing") || foldersThatChanged.length > 0)
 		{
 			LogHelper.info("[Filesystem] Assets changed! reprocessing");
 
-			copyFilesToStagingArea();
+			syncFilesInStagingArea();
 
 			cleanUpIgnoredFiles();
 
 			processFiles();
 
-			saveHash(currentHash);
+			cleanUpIgnoredFiles();
+
+			saveHash();
 		}
 		else
 		{
@@ -157,35 +184,100 @@ class LibraryBuild
 		hashPath = Path.join([Configuration.getData().OUTPUT, "filesystem", "assetFolderHash.hash"]);
 	}
 
-
-	private function generateCurrentHash(): Int
+	private function generateCurrentHash(): Void
 	{
-		var arrayOfHashes = [];
+		hash = {
+			PROCESSOR_HASH: HashHelper.getFnv32IntFromIntArray(AssetProcessorRegister.hashList),
+			FOLDER_HASHES: new Map(),
+			HASH_VERSION: HASH_VERSION
+		};
+
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
-			addHashOfFolderRecursively(arrayOfHashes, folder);
+			addHashOfFolderRecursively(folder);
 		}
-
-		arrayOfHashes = arrayOfHashes.concat(AssetProcessorRegister.hashList);
-
-		return arrayOfHashes.getFnv32IntFromIntArray();
 	}
 
-	private function addHashOfFolderRecursively(arrayOfHashes: Array<Int>, folder): Void
+	private function addHashOfFolderRecursively(folder: String): Void
 	{
-		var hash: Int = DirHashHelper.getHashOfDirectoryRecursively(folder, LibraryConfiguration.getData().IGNORE_LIST);
-		arrayOfHashes.push(hash);
+		var dirHash: Int = DirHashHelper.getHashOfDirectory(folder, LibraryConfiguration.getData().IGNORE_LIST);
+
+		hash.FOLDER_HASHES.set(folder, {FOLDER: ".", HASH: dirHash, ASSET_FOLDER: folder});
+
+		var folderList = PathHelper.getRecursiveFolderListUnderFolder(folder);
+		for (innerFolder in folderList)
+		{
+			var dirHash: Int = DirHashHelper.getHashOfDirectory(
+								Path.join([folder, innerFolder]),
+								LibraryConfiguration.getData().IGNORE_LIST);
+
+			hash.FOLDER_HASHES.set(Path.join([folder, innerFolder]), {
+					FOLDER: innerFolder,
+					HASH: dirHash,
+					ASSET_FOLDER: folder
+			});
+		}
 	}
 
-	private function getCachedHash(): Int
+	private function getCachedHash(): Void
 	{
 		if (FileSystem.exists(hashPath))
 		{
-            var hash: String = File.getContent(hashPath);
+	        var hashContent = File.getContent(hashPath);
+	        previousHash = Json.parse(hashContent);
 
-            return Std.parseInt(hash);
+			if (Reflect.hasField(previousHash, "HASH_VERSION") &&
+				previousHash.HASH_VERSION == HASH_VERSION)
+			{
+				/// finalize by transforming folder hashes into map
+				var keyList = Reflect.fields(previousHash.FOLDER_HASHES);
+				var map = new Map<String, FolderHash>();
+
+				for (key in keyList)
+				{
+					map.set(key, Reflect.field(previousHash.FOLDER_HASHES, key));
+				}
+
+				previousHash.FOLDER_HASHES = map;
+
+				return;
+			}
 		}
-		return 0;
+
+		previousHash = {
+			PROCESSOR_HASH: 0,
+			FOLDER_HASHES: new Map(),
+			HASH_VERSION: HASH_VERSION
+		}
+	}
+
+	private function compareHashes(): Void
+	{
+		if (hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH)
+		{
+			/// remake all the assets
+			for (key in hash.FOLDER_HASHES.keys())
+			{
+				var folder = hash.FOLDER_HASHES.get(key).FOLDER;
+				foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
+			}
+		}
+		else
+		{
+			for (key in hash.FOLDER_HASHES.keys())
+			{
+				if (previousHash.FOLDER_HASHES.exists(key))
+				{
+					if (previousHash.FOLDER_HASHES.get(key).HASH == hash.FOLDER_HASHES.get(key).HASH)
+					{
+						continue;
+					}
+					foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
+				}
+			}
+		}
+
+		trace(foldersThatChanged);
 	}
 
 	private function deleteCachedHash(): Void
@@ -196,31 +288,76 @@ class LibraryBuild
 		}
 	}
 
-	private function saveHash(hash: Int): Void
+	private function saveHash(): Void
 	{
         if (FileSystem.exists(hashPath))
         {
             FileSystem.deleteFile(hashPath);
         }
 
-        File.saveContent(hashPath, Std.string(hash));
+        File.saveContent(hashPath, Json.stringify(hash));
 	}
 
-	private function copyFilesToStagingArea(): Void
+	private function syncFilesInStagingArea(): Void
 	{
-		if (FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
+		var foldersToCheck: Map<String, Array<String>> = new Map(); /// path in staging to paths in asset folder
+
+		for (folderHash in foldersThatChanged)
 		{
-			PathHelper.removeDirectory(AssetProcessorRegister.pathToTemporaryAssetArea);
+			if (!foldersToCheck.exists(folderHash.FOLDER))
+			{
+				foldersToCheck.set(folderHash.FOLDER, []);
+			}
+
+			foldersToCheck.get(folderHash.FOLDER).push(folderHash.ASSET_FOLDER);
 		}
 
-		PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
-
-		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
+		for (folderPath in foldersToCheck.keys())
 		{
-			if(folder == null)
-				return;
+			var originFileList: Array<{FILE: String, ASSET_FOLDER: String}> = [];
 
-			FileHelper.recursiveCopyFiles(folder, AssetProcessorRegister.pathToTemporaryAssetArea, true, true);
+			for (assetFolder in foldersToCheck.get(folderPath))
+			{
+				var fullOriginPath = Path.join([assetFolder, folderPath]);
+
+				var newFileList = FileSystem.readDirectory(fullOriginPath);
+
+				for (file in newFileList)
+				{
+					var fullFilePath = Path.join([fullOriginPath, file]);
+					if (!FileSystem.isDirectory(fullFilePath))
+					{
+						originFileList.push({FILE: Path.join([folderPath, file]), ASSET_FOLDER: assetFolder});
+					}
+				}
+			}
+
+			var targetFolder = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, folderPath]);
+			/// cleanup target folder
+			if (FileSystem.exists(targetFolder))
+			{
+				var targetFileList = FileSystem.readDirectory(targetFolder);
+
+				for (file in targetFileList)
+				{
+					var fullPath = Path.join([targetFolder, file]);
+					if (!FileSystem.isDirectory(fullPath))
+					{
+						FileSystem.deleteFile(fullPath);
+					}
+				}
+			}
+			else
+			{
+				PathHelper.mkdir(targetFolder);
+			}
+
+			for (fileAnon in originFileList)
+			{
+				var originPath = Path.join([fileAnon.ASSET_FOLDER, fileAnon.FILE]);
+				var targetPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, fileAnon.FILE]);
+				FileHelper.copyIfNewer(originPath, targetPath);
+			}
 		}
 	}
 
@@ -246,6 +383,18 @@ class LibraryBuild
 
 	private function processFiles(): Void
 	{
+		///fill folders that changed in the assetProcessorRegister
+		var setMap: Map<String, Void> = new Map();
+		for (folderHash in foldersThatChanged)
+		{
+			setMap.set(folderHash.FOLDER, null);
+		}
+
+		for (key in setMap.keys())
+		{
+			AssetProcessorRegister.foldersThatChanged.push(key + "/");
+		}
+
 		AssetProcessorRegister.process();
 	}
 
@@ -300,20 +449,18 @@ class LibraryBuild
 	}
 	private function preBuildPerPlatform()
 	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "ios"]);
-		var projectDirectory = Path.join([targetDirectory, Configuration.getData().APP.FILE]);
+		var targetFolder = Path.join([	Configuration.getData().OUTPUT,
+										"ios",
+										Configuration.getData().APP.FILE,
+										INTERNAL_ASSET_FOLDER]);
 
-		var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER]);
+		if (FileSystem.exists(targetFolder))
+		{
+			PathHelper.removeDirectory(targetFolder);
+		}
+
 		PathHelper.mkdir(targetFolder);
-
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
-        for (file in fileListToCopy)
-        {
-        	var targetFolder = Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, Path.directory(file)]);
-        	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([projectDirectory, INTERNAL_ASSET_FOLDER, file]));
-        }
-		removeUnusedFiles(fileListToCopy, targetFolder);
+		FileHelper.recursiveCopyFiles(AssetProcessorRegister.pathToTemporaryAssetArea, targetFolder, true, true);
 	}
 
 	private function postBuildPerPlatform(): Void
@@ -386,8 +533,7 @@ class LibraryBuild
 			}
 
 			PathHelper.mkdir(targetDirectory);
-
-			FileHelper.recursiveCopyFiles(targetDirectory, AssetProcessorRegister.pathToTemporaryAssetArea, true, true);
+			FileHelper.recursiveCopyFiles(AssetProcessorRegister.pathToTemporaryAssetArea, targetDirectory, true, true);
 		}
 	}
 
