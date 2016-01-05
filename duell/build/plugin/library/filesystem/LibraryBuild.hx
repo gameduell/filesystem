@@ -276,8 +276,6 @@ class LibraryBuild
 				}
 			}
 		}
-
-		trace(foldersThatChanged);
 	}
 
 	private function deleteCachedHash(): Void
