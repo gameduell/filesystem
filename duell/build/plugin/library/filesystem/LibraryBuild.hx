@@ -582,62 +582,60 @@ class LibraryBuild
 
 	}
 
-	// #elseif platform_electron
+	#elseif platform_electron
 
-	// private function postParsePerPlatform(): Void
-	// {
-	// 	LogHelper.info('LibraryBuild - filesystem - target - electron --> postParsePerPlatform');
-	// }
+	private function postParsePerPlatform(): Void
+	{
+		LogHelper.info('LibraryBuild - filesystem - target - electron --> postParsePerPlatform');
+	}
 
-	// private function postPostParsePerPlatform(): Void
-	// {
-	// 	LogHelper.info('LibraryBuild - filesystem - target - electron --> postPostParsePerPlatform');
-	// 	var targetDirectory = Path.join([Configuration.getData().OUTPUT, "electron", INTERNAL_ASSET_FOLDER]);
-	// 	LogHelper.info('target: $targetDirectory');
+	private function postPostParsePerPlatform(): Void
+	{
+		LogHelper.info('LibraryBuild - filesystem - target - electron --> postPostParsePerPlatform');
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "electron", INTERNAL_ASSET_FOLDER]);
+		LogHelper.info('target: $targetDirectory');
 
-	// 	if (LibraryConfiguration.getData().EMBED_ASSETS)
-	// 	{
-	// 		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
+		if (LibraryConfiguration.getData().EMBED_ASSETS)
+		{
+			var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
 
-	// 		for (file in fileListToCopy)
-	// 		{
-	// 			var destPath = Path.join([targetDirectory, file]);
-	// 			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-	// 			PathHelper.mkdir(Path.directory(destPath));
-	// 			FileHelper.copyIfNewer(origPath, destPath);
+			for (file in fileListToCopy)
+			{
+				var destPath = Path.join([targetDirectory, file]);
+				var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
+				PathHelper.mkdir(Path.directory(destPath));
+				FileHelper.copyIfNewer(origPath, destPath);
 
-	// 			/// Add files as resources to haxe arguments
-	// 			if(LibraryConfiguration.getData().EMBED_ASSETS)
-	// 			{
-	// 				LogHelper.info('[FILESYSTEM] Embedding electron asset ' + destPath + "@" + file);
-	// 				Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
-	//         	}
-	//         }
-	// 	}
-	// 	else
-	// 	{
-	// 		if (FileSystem.exists(targetDirectory))
-	// 		{
-	// 			PathHelper.removeDirectory(targetDirectory);
-	// 		}
+				/// Add files as resources to haxe arguments
+				if(LibraryConfiguration.getData().EMBED_ASSETS)
+				{
+					LogHelper.info('[FILESYSTEM] Embedding electron asset ' + destPath + "@" + file);
+					Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
+				}
+			}
+		}
+		else
+		{
+			if (FileSystem.exists(targetDirectory))
+			{
+				PathHelper.removeDirectory(targetDirectory);
+			}
 
-	// 		//PathHelper.mkdir(targetDirectory);
-	// 		var pathFrom = AssetProcessorRegister.pathToTemporaryAssetArea;
-	// 		LogHelper.info('start copy from: $pathFrom');
-	// 		LogHelper.info('start copy to: $targetDirectory');
-	// 		FileHelper.recursiveCopyFiles(pathFrom, targetDirectory, true, true);
-	// 	}
-	// }
+			PathHelper.mkdir(targetDirectory);
+			var pathFrom = AssetProcessorRegister.pathToTemporaryAssetArea;
+			FileHelper.recursiveCopyFiles(pathFrom, targetDirectory, true, true);
+		}
+	}
 
-	// private function preBuildPerPlatform(): Void
-	// {
-	// 	LogHelper.info('LibraryBuild - filesystem - target - electron --> preBuildPerPlatform');
-	// }
+	private function preBuildPerPlatform(): Void
+	{
+		LogHelper.info('LibraryBuild - filesystem - target - electron --> preBuildPerPlatform');
+	}
 
-	// //not called
-	// private function postBuildPerPlatform(): Void
-	// {
-	// }
+	//not called
+	private function postBuildPerPlatform(): Void
+	{
+	}
 
 
 	#else

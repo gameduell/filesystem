@@ -50,6 +50,7 @@ class FileSystem
         return fsInstance;
     }
 
+
     private var staticDataPath : String = null;
 
     private function new(){
