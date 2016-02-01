@@ -253,7 +253,7 @@ class LibraryBuild
 
 	private function compareHashes(): Void
 	{
-		if (hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH)
+		if (hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH || Arguments.isDefineSet("forceAssetProcessing"))
 		{
 			/// remake all the assets
 			for (key in hash.FOLDER_HASHES.keys())
@@ -479,7 +479,7 @@ class LibraryBuild
 	{
 
 		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
+		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE, "assets"]);
 
 		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
