@@ -47,17 +47,17 @@ class MainTester
         r = new TestRunner(testComplete, DuellKit.instance().onError);
 		r.add(new FileSystemTest());
 
-        #if test
+        //#if test
 
         #if jenkins
-        r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
+            r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
         #else
-        r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
+            r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
         #end
 
-        #else
-        r.addLogger(new TestSimpleLogger());
-        #end
+        // #else
+        // r.addLogger(new TestSimpleLogger());
+        // #end
 
         r.run();
     }
