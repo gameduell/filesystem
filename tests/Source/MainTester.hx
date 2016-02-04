@@ -49,14 +49,14 @@ class MainTester
 
         //#if test
 
-        #if jenkins
-            r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
-        #else
-            r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
-        #end
+        // #if jenkins
+        //     r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
+        // #else
+        //     r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
+        // #end
 
         // #else
-        // r.addLogger(new TestSimpleLogger());
+        r.addLogger(new TestJUnitLogger());
         // #end
 
         r.run();

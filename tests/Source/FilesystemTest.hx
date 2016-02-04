@@ -179,7 +179,6 @@ class FileSystemTest extends unittest.TestCase
         assertEquals(testFileText, outputData.readString());
 
         fileRead.close();
-
     }
 
     public function testExistence(): Void

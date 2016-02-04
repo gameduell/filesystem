@@ -26,15 +26,13 @@
 
 package filesystem.modules;
 
-@:jsRequire("fs")
-extern class FS
+import haxe.extern.Rest;
+
+@:jsRequire('path')
+extern class Path
 {
-    static function readdirSync(path : String ) : Array<String>;
-    static function stat(path : String, callback : Dynamic -> Stats -> Void ) : Bool;
-    static function readFileSync(path:String, ?opts:Dynamic) : Buffer;
-    static function statSync(path : String) : Stats;
-    static function unlinkSync(path : String) : Dynamic;
-    static function rmdirSync(path : String) : Dynamic;
-    static function mkdirSync(path : String, mode:String='0o777') : Void;
-    static function writeFileSync(path : String, data:Dynamic, ?options:Dynamic) : Dynamic;
+    static var sep(default, null) : String;
+    static function isAbsolute( path:String ) : Bool;
+    static function join( path:String, paths:Rest<String> ) : String;
+    static function resolve( path:String, paths:Rest<String> ) : String;
 }
