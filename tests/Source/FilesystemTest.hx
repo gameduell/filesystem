@@ -275,16 +275,13 @@ class FileSystemTest extends unittest.TestCase
         fileWrite.writeFromData(inputData);
 
         var fileRead = FileSystem.instance().getFileReader(testFileURL);
-
         var fileSize = FileSystem.instance().getFileSize(testFileURL);
-
         var outputData = new Data(fileSize);
 
         assertTrue(outputData.readString() != testFileText);
-
         assertEquals(outputData.allocedLength, fileSize);
+        
         fileRead.readIntoData(outputData);
-
         assertEquals(testFileText, outputData.readString());
 
         fileRead.close();

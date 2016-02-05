@@ -26,7 +26,12 @@
 
 package filesystem;
 
+import js.html.ArrayBuffer;
+
 import types.Data;
+
+import filesystem.modules.FS;
+import filesystem.modules.Buffer;
 
 class FileWriter
 {
@@ -34,10 +39,11 @@ class FileWriter
 
     private var currentSeekPosition = 0;
     public var seekPosition (get, set) : Int;
+    private var path : String;
 
-    public function new(d : Data)
+    public function new( path:String )
     {
-        fileData = d;
+        this.path = path;
     }
 
     public function get_seekPosition () : Int
@@ -53,16 +59,15 @@ class FileWriter
 
     public function writeFromData(data : Data)
     {
-        if(fileData.allocedLength < currentSeekPosition + data.offsetLength)
+        var buffer = new Buffer(data.allocedLength);
+        var uint8Array = data.uint8Array;
+        var len = uint8Array.length;
+        for ( i in 0...len )
         {
-            var partOfMemoryCovered = (fileData.allocedLength - currentSeekPosition);
-            var extraMemoryNeeded = data.offsetLength - partOfMemoryCovered;
-            fileData.resize(fileData.allocedLength + extraMemoryNeeded);
+            buffer.writeInt8( uint8Array[i], i );
         }
 
-        fileData.offset = currentSeekPosition;
-        fileData.offsetLength = data.offsetLength;
-        fileData.writeData(data);
+        FS.appendFileSync(path, buffer);
     }
 
     public function close()

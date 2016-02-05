@@ -91,26 +91,10 @@ class FileSystem
 
     public function getFileWriter(url : String) : FileWriter
     {
-        try
-        {
-            url = url.urlDecode();
-
-            var rawBuffer = FS.readFileSync( url );
-            var data = new Data(rawBuffer.length);
-            var v = convert( rawBuffer );
-            data.arrayBuffer = v.buffer;
-
-            return new FileWriter( data );
-        }
-        catch(e : Dynamic)
-        {
-            trace("Error in FileSystem::getFileWriter : " + e);
-        }
-
-        return new FileWriter(new Data(0));
+        return new FileWriter( url.urlDecode() );
     }
 
-    private function convert( buf:Buffer ) : DataView
+    private function convertToDataView( buf:Buffer ) : DataView
     {
         var ab = new ArrayBuffer(buf.length);
         var view = new DataView(ab);
@@ -131,7 +115,7 @@ class FileSystem
 
             var rawBuffer = FS.readFileSync( url );
             var data = new Data(rawBuffer.length);
-            var v = convert( rawBuffer );
+            var v = convertToDataView( rawBuffer );
             data.arrayBuffer = v.buffer;
 
             return new FileReader( data );
@@ -150,7 +134,7 @@ class FileSystem
         {
             url = url.urlDecode();
 
-            FS.writeFileSync( url.urlDecode(), "" );
+            FS.writeFileSync( url, "" );
         }
         catch(e : Dynamic)
         {
@@ -252,8 +236,9 @@ class FileSystem
         catch(e : Dynamic)
         {
             trace(e);
-            return 0;
         }
+
+        return 0;
     }
 
     public function deleteFile(url : String) : Void
