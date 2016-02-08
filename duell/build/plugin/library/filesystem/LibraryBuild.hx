@@ -30,6 +30,9 @@ import duell.build.plugin.library.filesystem.LibraryConfiguration;
 import duell.build.plugin.platform.PlatformConfiguration;
 import duell.build.objects.Configuration;
 
+import duell.build.plugin.library.filesystem.platform.IPlatformBuild;
+import duell.build.plugin.library.filesystem.platform.NoSupportedPlatform;
+
 import duell.objects.DuellLib;
 import duell.helpers.TemplateHelper;
 import duell.helpers.FileHelper;
@@ -79,7 +82,22 @@ class LibraryBuild
 
 	private var fullReset: Bool = false;
 
-	public function new () {}
+	private var platformBuild : IPlatformBuild;
+
+	public function new () {
+
+		#if platform_ios
+			platformBuild = new duell.build.plugin.library.filesystem.platform.IOSBuild( INTERNAL_ASSET_FOLDER );
+		#elseif platform_android
+			platformBuild = new duell.build.plugin.library.filesystem.platform.AndroidBuild();
+		#elseif platform_html5
+			platformBuild = new duell.build.plugin.library.filesystem.platform.HTML5Build( INTERNAL_ASSET_FOLDER );
+		#elseif platform_electron
+			platformBuild = new duell.build.plugin.library.filesystem.platform.ElectronBuild( INTERNAL_ASSET_FOLDER );
+		#else
+			platformBuild = new NoSupportedPlatform();
+		#end
+	}
 
 	public function postParse() : Void
 	{
@@ -124,15 +142,15 @@ class LibraryBuild
 		}
 		else
 		{
-            if (!FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
-            {
-                PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
-            }
+			if (!FileSystem.exists(AssetProcessorRegister.pathToTemporaryAssetArea))
+			{
+				PathHelper.mkdir(AssetProcessorRegister.pathToTemporaryAssetArea);
+			}
 
 			LogHelper.info("", "[Filesystem] no asset change! bypassing the processing");
 		}
 
-	    postPostParsePerPlatform();
+		postPostParsePerPlatform();
 	}
 
 	public function preBuild() : Void
@@ -157,13 +175,13 @@ class LibraryBuild
 
 	private function copyAssetListHaxeFile() : Void
 	{
-        var libPath : String = DuellLib.getDuellLib("filesystem").getPath();
+		var libPath : String = DuellLib.getDuellLib("filesystem").getPath();
 
-        var exportPath : String = Path.join([Configuration.getData().OUTPUT, "haxe", "filesystem"]);
+		var exportPath : String = Path.join([Configuration.getData().OUTPUT, "haxe", "filesystem"]);
 
-        var classSourcePath : String = Path.join([libPath,"template", "filesystem"]);
+		var classSourcePath : String = Path.join([libPath,"template", "filesystem"]);
 
-        TemplateHelper.recursiveCopyTemplatedFiles(classSourcePath, exportPath, Configuration.getData(), Configuration.getData().TEMPLATE_FUNCTIONS);
+		TemplateHelper.recursiveCopyTemplatedFiles(classSourcePath, exportPath, Configuration.getData(), Configuration.getData().TEMPLATE_FUNCTIONS);
 	}
 
 	public function postBuild() : Void
@@ -223,8 +241,8 @@ class LibraryBuild
 	{
 		if (FileSystem.exists(hashPath))
 		{
-	        var hashContent = File.getContent(hashPath);
-	        previousHash = Json.parse(hashContent);
+			var hashContent = File.getContent(hashPath);
+			previousHash = Json.parse(hashContent);
 
 			if (Reflect.hasField(previousHash, "HASH_VERSION") &&
 				previousHash.HASH_VERSION == HASH_VERSION)
@@ -288,12 +306,12 @@ class LibraryBuild
 
 	private function saveHash(): Void
 	{
-        if (FileSystem.exists(hashPath))
-        {
-            FileSystem.deleteFile(hashPath);
-        }
+		if (FileSystem.exists(hashPath))
+		{
+			FileSystem.deleteFile(hashPath);
+		}
 
-        File.saveContent(hashPath, Json.stringify(hash));
+		File.saveContent(hashPath, Json.stringify(hash));
 	}
 
 	private function syncFilesInStagingArea(): Void
@@ -410,198 +428,24 @@ class LibraryBuild
 			LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 		}
 	}
-	private function removeUnusedFiles(fileListToCopy: Array<String>, targetFolder: String): Void
-	{
-		if (!FileSystem.exists(targetFolder))
-			return;
-
-		/// get all the files in the Export folder
-		var fileListFromPreviousBuild = PathHelper.getRecursiveFileListUnderFolder(targetFolder);
-
-		/// remove the old and unneeded files
-		for (oldFile in fileListFromPreviousBuild)
-		{
-			if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(Path.join([targetFolder, oldFile])))
-			{
-				LogHelper.info('[FILESYSTEM] Removing unused file ' + oldFile);
-				FileSystem.deleteFile(oldFile);
-			}
-		}
-	}
-
-	#if platform_ios
 
 	private function postParsePerPlatform(): Void
 	{
-		/// ADD ASSET FOLDER TO THE XCODE
-		var assetFolderID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
-		var fileID = duell.build.helpers.XCodeHelper.getUniqueIDForXCode();
-		PlatformConfiguration.getData().ADDL_PBX_BUILD_FILE.push('      ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */ = {isa = PBXBuildFile; fileRef = ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */; };');
-		PlatformConfiguration.getData().ADDL_PBX_FILE_REFERENCE.push('      ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */ = {isa = PBXFileReference; lastKnownFileType = folder; name = $INTERNAL_ASSET_FOLDER; path = ' + Configuration.getData().APP.FILE + '/$INTERNAL_ASSET_FOLDER; sourceTree = \"<group>\"; };');
-		PlatformConfiguration.getData().ADDL_PBX_RESOURCE_GROUP.push('            ' + fileID + ' /* $INTERNAL_ASSET_FOLDER */,');
-		PlatformConfiguration.getData().ADDL_PBX_RESOURCES_BUILD_PHASE.push('            ' + assetFolderID + ' /* $INTERNAL_ASSET_FOLDER in Resources */,');
+		platformBuild.postParsePerPlatform();
 	}
 
-	private function postPostParsePerPlatform():Void
-	{
-	}
-	private function preBuildPerPlatform()
-	{
-		var targetFolder = Path.join([	Configuration.getData().OUTPUT,
-										"ios",
-										Configuration.getData().APP.FILE,
-										INTERNAL_ASSET_FOLDER]);
-
-		if (FileSystem.exists(targetFolder))
-		{
-			PathHelper.removeDirectory(targetFolder);
-		}
-
-		PathHelper.mkdir(targetFolder);
-		FileHelper.recursiveCopyFiles(AssetProcessorRegister.pathToTemporaryAssetArea, targetFolder, true, true);
-	}
-
-	private function postBuildPerPlatform(): Void
-	{
-
-	}
-
-	#elseif platform_android
-
-	private function postParsePerPlatform(): Void
-	{
-	}
-	private function postPostParsePerPlatform():Void
-	{
-	}
-
-	private function preBuildPerPlatform(): Void
-	{
-
-		/// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE, "assets"]);
-
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
-        for (file in fileListToCopy)
-        {
-        	var targetFolder = Path.join([targetDirectory, Path.directory(file)]);
-        	PathHelper.mkdir(targetFolder);
-        	FileHelper.copyIfNewer(Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]), Path.join([targetDirectory, file]));
-        }
-		removeUnusedFiles(fileListToCopy, targetDirectory);
-	}
-
-	private function postBuildPerPlatform(): Void
-	{
-
-	}
-
-	#elseif platform_html5
-	private function postParsePerPlatform(): Void
-	{
-	}
-	private function postPostParsePerPlatform():Void
-	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "html5", "web", INTERNAL_ASSET_FOLDER]);
-
-		if (LibraryConfiguration.getData().EMBED_ASSETS)
-		{
-			var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
-
-	        for (file in fileListToCopy)
-	        {
-				var destPath = Path.join([targetDirectory, file]);
-				var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-	        	PathHelper.mkdir(Path.directory(destPath));
-	        	FileHelper.copyIfNewer(origPath, destPath);
-
-	        	/// Add files as resources to haxe arguments
-	        	if(LibraryConfiguration.getData().EMBED_ASSETS)
-	        	{
-					LogHelper.info('[FILESYSTEM] Embedding html5 asset ' + destPath + "@" + file);
-	        		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
-	        	}
-	        }
-		}
-		else
-		{
-			if (FileSystem.exists(targetDirectory))
-			{
-				PathHelper.removeDirectory(targetDirectory);
-			}
-
-			PathHelper.mkdir(targetDirectory);
-			FileHelper.recursiveCopyFiles(AssetProcessorRegister.pathToTemporaryAssetArea, targetDirectory, true, true);
-		}
-	}
-
-	private function preBuildPerPlatform(): Void
-	{
-    }
-
-	private function postBuildPerPlatform(): Void
-	{
-
-	}
-
-	#elseif platform_flash
-
-	private function postParsePerPlatform(): Void
-	{
-	}
-
-	private function postPostParsePerPlatform():Void
-	{
-		var targetDirectory = Path.join([Configuration.getData().OUTPUT, "flash", "web", INTERNAL_ASSET_FOLDER]);
-
-		var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
-
-	    for (file in fileListToCopy)
-	    {
-			var destPath = Path.join([targetDirectory, file]);
-			var origPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
-	    	PathHelper.mkdir(Path.directory(destPath));
-	    	FileHelper.copyIfNewer(origPath, destPath);
-
-	    	/// Add files as resources to haxe arguments
-	    	if(LibraryConfiguration.getData().EMBED_ASSETS)
-	    	{
-				LogHelper.info('[FILESYSTEM] Embedding flash asset ' + destPath + "@" + file);
-	    		Configuration.getData().HAXE_COMPILE_ARGS.push("-resource " + destPath + "@" + file);
-	    	}
-	    }
-		removeUnusedFiles(fileListToCopy, targetDirectory);
-	}
-
-	private function preBuildPerPlatform(): Void
-	{
-	}
-
-	private function postBuildPerPlatform(): Void
-	{
-
-	}
-
-	#else
-
-	private function postParsePerPlatform(): Void
-	{
-
-	}
 	private function postPostParsePerPlatform(): Void
 	{
-
+		platformBuild.postPostParsePerPlatform();
 	}
+
 	private function preBuildPerPlatform(): Void
 	{
-
+		platformBuild.preBuildPerPlatform();
 	}
 
 	private function postBuildPerPlatform(): Void
 	{
-
+		platformBuild.postBuildPerPlatform();
 	}
-
-
-	#end
 }
