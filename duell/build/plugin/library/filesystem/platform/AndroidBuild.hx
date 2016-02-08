@@ -31,7 +31,7 @@ class AndroidBuild implements IPlatformBuild
     public function preBuildPerPlatform(): Void
     {
         /// currently not using the INTERNAL_ASSET_FOLDER, it goes directly into the assets folder.
-        var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", "bin", "assets"]);
+        var targetDirectory = Path.join([Configuration.getData().OUTPUT, "android", Configuration.getData().APP.FILE, "assets"]);
 
         var fileListToCopy = PathHelper.getRecursiveFileListUnderFolder(AssetProcessorRegister.pathToTemporaryAssetArea);
         for (file in fileListToCopy)
