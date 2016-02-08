@@ -15,14 +15,15 @@ class PlatformBuildHelper
 
         /// get all the files in the Export folder
         var fileListFromPreviousBuild = PathHelper.getRecursiveFileListUnderFolder(targetFolder);
-
+        
         /// remove the old and unneeded files
         for (oldFile in fileListFromPreviousBuild)
         {
-            if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(Path.join([targetFolder, oldFile])))
+            var path = Path.join([targetFolder, oldFile]);
+            if(fileListToCopy.indexOf(oldFile) < 0 && FileSystem.exists(path))
             {
                 LogHelper.info('[FILESYSTEM] Removing unused file ' + oldFile);
-                FileSystem.deleteFile(oldFile);
+                FileSystem.deleteFile(path);
             }
         }
     }
