@@ -30,8 +30,8 @@ import js.html.ArrayBuffer;
 
 import types.Data;
 
-import filesystem.modules.FS;
-import filesystem.modules.Buffer;
+import js.node.Fs;
+import js.node.buffer.Buffer;
 
 class FileWriter
 {
@@ -67,7 +67,7 @@ class FileWriter
             buffer.writeInt8( uint8Array[i], i );
         }
 
-        FS.appendFileSync(path, buffer);
+        Fs.appendFileSync(path, buffer);
     }
 
     public function close()

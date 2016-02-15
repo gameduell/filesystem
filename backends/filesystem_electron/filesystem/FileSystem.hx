@@ -26,10 +26,10 @@
 
 package filesystem;
 
-import filesystem.modules.FS;
-import filesystem.modules.Stats;
-import filesystem.modules.Path;
-import filesystem.modules.Buffer;
+import js.node.Fs;
+import js.node.fs.Stats;
+import js.node.Path;
+import js.node.buffer.Buffer;
 
 import js.html.ArrayBuffer;
 import js.html.DataView;
@@ -113,7 +113,7 @@ class FileSystem
         {
             url = url.urlDecode();
 
-            var rawBuffer = FS.readFileSync( url );
+            var rawBuffer = Fs.readFileSync( url );
             var data = new Data(rawBuffer.length);
             var v = convertToDataView( rawBuffer );
             data.arrayBuffer = v.buffer;
@@ -134,7 +134,7 @@ class FileSystem
         {
             url = url.urlDecode();
 
-            FS.writeFileSync( url, "" );
+            Fs.writeFileSync( url, "" );
         }
         catch(e : Dynamic)
         {
@@ -174,7 +174,7 @@ class FileSystem
     {
         try
         {
-            FS.mkdirSync( path.urlDecode() );
+            Fs.mkdirSync( path.urlDecode() );
         }
         catch(e : Dynamic)
         {
@@ -189,7 +189,7 @@ class FileSystem
     {
         try
         {
-            var stats = FS.statSync( url.urlDecode() );
+            var stats = Fs.statSync( url.urlDecode() );
             return stats.isDirectory() || stats.isFile();
         }
         catch(e : Dynamic)
@@ -202,7 +202,7 @@ class FileSystem
     {
         try
         {
-            var stats = FS.statSync( url.urlDecode() );
+            var stats = Fs.statSync( url.urlDecode() );
             return stats.isDirectory();
         }
         catch(e : Dynamic)
@@ -217,7 +217,7 @@ class FileSystem
         {
             url = url.urlDecode();
 
-            var stats = FS.statSync( url.urlDecode() );
+            var stats = Fs.statSync( url.urlDecode() );
             return stats.isFile();
         }
         catch(e : Dynamic)
@@ -230,7 +230,7 @@ class FileSystem
     {
         try
         {
-            var stats = FS.statSync( url.urlDecode() );
+            var stats = Fs.statSync( url.urlDecode() );
             return Reflect.field(stats, "size");
         }
         catch(e : Dynamic)
@@ -245,7 +245,7 @@ class FileSystem
     {
         try
         {
-            FS.unlinkSync( url.urlDecode() );
+            Fs.unlinkSync( url.urlDecode() );
         }
         catch(e : Dynamic)
         {}
@@ -265,23 +265,23 @@ class FileSystem
         {
             url = url.urlDecode();
 
-            var files = FS.readdirSync( url );
+            var files = Fs.readdirSync( url );
             for ( c in files )
             {
                 var path = Path.join( url, c );
-                var stats = FS.statSync( path );
+                var stats = Fs.statSync( path );
                 if( stats.isDirectory() )
                 {
                     deleteFolder( path ); //check current folder for files
                 }
                 else
                 {
-                    FS.unlinkSync( path );//remove file
+                    Fs.unlinkSync( path );//remove file
                 }
                 
             }
 
-            FS.rmdirSync( url );//remove folder
+            Fs.rmdirSync( url );//remove folder
         }
         catch(e : Dynamic)
         {
