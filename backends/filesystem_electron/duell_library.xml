@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library>
-
-    <duelllib name="nodejs" version="master" />
-
+    <haxelib name="hxnodejs" version="4.0.2" />
 </library>
