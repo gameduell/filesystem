@@ -6,23 +6,11 @@ class NoSupportedPlatform implements IPlatformBuild
 {
     public function new(){}
 
-    public function postParsePerPlatform(): Void
-    {
-        LogHelper.info('No supported platform!');
-    }
+    public function postParsePerPlatform(): Void {}
 
-    public function postPostParsePerPlatform(): Void
-    {
-        LogHelper.info('No supported platform!');
-    }
+    public function postPostParsePerPlatform(): Void {}
 
-    public function preBuildPerPlatform(): Void
-    {
-        LogHelper.info('No supported platform!');
-    }
+    public function preBuildPerPlatform(): Void {}
 
-    public function postBuildPerPlatform(): Void
-    {
-        LogHelper.info('No supported platform!');
-    }
+    public function postBuildPerPlatform(): Void {}
 }

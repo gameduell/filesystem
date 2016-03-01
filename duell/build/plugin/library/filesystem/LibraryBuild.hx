@@ -118,6 +118,10 @@ class LibraryBuild
 
 	public function postPostParse(): Void
 	{
+		#if (!platform_ios && !platform_android && !platform_html5 && !platform_electron)
+		return;
+		#end
+
 		generateVariables();
 
 		generateCurrentHash();
