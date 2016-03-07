@@ -296,6 +296,10 @@ class LibraryBuild
 					}
 					foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
 				}
+				else
+				{
+					foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
+				}
 			}
 		}
 	}
