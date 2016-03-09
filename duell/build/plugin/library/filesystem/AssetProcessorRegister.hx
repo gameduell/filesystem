@@ -42,6 +42,7 @@ class AssetProcessorRegister
     public static var pathToTemporaryAssetArea(default, null): String;
 
 	public static var foldersThatChanged: Array<String> = [];
+	public static var fullRebuild: Bool = false;
 
 	public static var hashList(default, null): Array<Int> = [];
 	public static function registerProcessor(proc: Void->Void, prio: AssetProcessorPriority, currentHash: Int)

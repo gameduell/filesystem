@@ -77,6 +77,7 @@ class LibraryBuild
 	private var previousHash: FileSystemHash;
 
 	private var foldersThatChanged: Array<FolderHash> = [];
+	private var fullRebuild: Bool = false; /// set if the config hash changes, or if forceAssetProcessing
 
 	private var previousProcessorHash: String = "";
 
@@ -283,6 +284,8 @@ class LibraryBuild
 				var folder = hash.FOLDER_HASHES.get(key).FOLDER;
 				foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
 			}
+
+			fullRebuild = true;
 		}
 		else
 		{
@@ -418,6 +421,8 @@ class LibraryBuild
 		{
 			AssetProcessorRegister.foldersThatChanged.push(key + "/");
 		}
+
+		AssetProcessorRegister.fullRebuild = fullRebuild;
 
 		AssetProcessorRegister.process();
 	}
