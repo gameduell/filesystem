@@ -2,7 +2,6 @@ package;
 
 import electron.App;
 import electron.BrowserWindow;
-import electron.CrashReporter;
 import js.Node.*;
 
 using StringTools;
@@ -13,17 +12,15 @@ class ElectronTestMain
 
     public static function main() : Void 
     {
-        CrashReporter.start();
-
-        App.on(AppEvent.WINDOW_ALL_CLOSED, function()
+        App.on(AppEventType.window_all_closed, function()
         {
             App.quit();
         });
 
-        App.on(AppEvent.READY, function()
+        App.on(AppEventType.ready, function()
         {
             browserWindow = new BrowserWindow({width:1024, height:768});
-            browserWindow.loadUrl('file://' + __dirname + '/index.html');
+            browserWindow.loadURL('file://' + __dirname + '/index.html');
             browserWindow.webContents.openDevTools();
 
             browserWindow.on('closed', function()

@@ -13,7 +13,7 @@
 
 	<duelllib name="duellkit" version="6.0.0+" />
 	<duelllib name="unittest" version="5.2.1+"/>
-	<duelllib name="filesystem" version="master"/>
+	<duelllib name="filesystem" version="electron_custom_mainProcessFile"/>
 	<duelllib name="electron" version="master" if="electron" />
 
 	<platform-config>
