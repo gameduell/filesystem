@@ -20,6 +20,7 @@
             <xs:element name="ignore" type="d:RegEx"/>
             <xs:element name="embed-assets" type="d:ValueBoolean"/>
         </xs:choice>
+        <xs:attributeGroup ref="d:Conditional" />
     </xs:complexType>
 
 </xs:schema>
