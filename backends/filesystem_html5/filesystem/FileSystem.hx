@@ -294,6 +294,8 @@ class FileSystem
 	}
 
 	static private var requestsLeft : Int;
+	static private var requestIndex: Int;
+	static private inline var bucketSize: Int = 2048;
 	public static function preloadStaticAssets(complete : Void -> Void) : Void
 	{
 
@@ -304,7 +306,13 @@ class FileSystem
 		}
 
 		requestsLeft = 0;
+		requestIndex = 0;
 
+		loadNextBucket(complete);
+	}
+
+	private static function loadNextBucket(complete : Void -> Void): Void
+	{
 		function encodeURLElement(element:String) : String
 		{
 			return element.urlEncode();
@@ -324,8 +332,19 @@ class FileSystem
 			return true;
 		}
 
-		for(val in filesystem.StaticAssetList.list)
+		for (j in 0...bucketSize)
 		{
+			if (requestIndex >= filesystem.StaticAssetList.list.length)
+			{
+				if(requestsLeft == 0)
+				{
+					complete();
+				}
+				break;
+			}
+
+			var val = filesystem.StaticAssetList.list[requestIndex];
+			++requestIndex;
 			if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
 			{
 				continue;
@@ -351,16 +370,11 @@ class FileSystem
 
 				if(requestsLeft == 0)
 				{
-					complete();
+					loadNextBucket(complete);
 				}
 			};
 
 			oReq.send(null);
-		}
-
-		if(requestsLeft == 0)
-		{
-			complete();
 		}
 	}
 
