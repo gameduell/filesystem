@@ -438,6 +438,9 @@ class LibraryBuild
 
 		for (file in files)
 		{
+			var fullPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, file]);
+			var stat = python.lib.Os.stat(fullPath);
+			LibraryConfiguration.getData().STATIC_ASSET_HASHES.push("" + stat.st_size + "" + stat.st_mtime);
 			LibraryConfiguration.getData().STATIC_ASSET_FILENAMES.push(file);
 		}
 	}
