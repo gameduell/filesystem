@@ -32,6 +32,11 @@ class StaticAssetList
 		"::__current__::",::end::
 	];
 
+	public static var hashes = [
+		::foreach LIBRARY.FILESYSTEM.STATIC_ASSET_HASHES::
+		"::__current__::",::end::
+	];
+
     public static var folders = [
         ::foreach LIBRARY.FILESYSTEM.STATIC_ASSET_SUBFOLDERS::
         "::__current__::",::end::

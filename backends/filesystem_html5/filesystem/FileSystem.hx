@@ -295,7 +295,7 @@ class FileSystem
 
 	static private var requestsLeft : Int;
 	static private var requestIndex: Int;
-	static private inline var bucketSize: Int = 2048;
+	static private inline var bucketSize: Int = 1024;
 	public static function preloadStaticAssets(complete : Void -> Void) : Void
 	{
 
@@ -344,6 +344,7 @@ class FileSystem
 			}
 
 			var val = filesystem.StaticAssetList.list[requestIndex];
+			var hash = filesystem.StaticAssetList.hashes[requestIndex];
 			++requestIndex;
 			if(checkIfAvailableInResourcesAndAddtoFilesystem(val))
 			{
@@ -352,6 +353,7 @@ class FileSystem
 			requestsLeft += 1;
 			var valWithAssets = getBaseURL()+"assets/"+val;
 			valWithAssets.split("/").map(encodeURLElement).join("/");
+			valWithAssets += "?hash=" + hash;
 
 			var oReq = new XMLHttpRequest();
 			oReq.open("GET", valWithAssets, true);
