@@ -137,8 +137,6 @@ class LibraryBuild
 
 			syncFilesInStagingArea();
 
-			cleanUpIgnoredFiles();
-
 			processFiles();
 
 			cleanUpIgnoredFiles();
@@ -351,6 +349,11 @@ class LibraryBuild
 
 				for (file in newFileList)
 				{
+					if (isFileIgnored(file))
+					{
+						continue;
+					}
+
 					var fullFilePath = Path.join([fullOriginPath, file]);
 					if (!FileSystem.isDirectory(fullFilePath))
 					{
@@ -386,6 +389,19 @@ class LibraryBuild
 				FileHelper.copyIfNewer(originPath, targetPath);
 			}
 		}
+	}
+
+	private function isFileIgnored(file: String): Bool
+	{
+		for (regex in LibraryConfiguration.getData().IGNORE_LIST)
+		{
+			if (regex.match(file))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private function cleanUpIgnoredFiles(): Void
