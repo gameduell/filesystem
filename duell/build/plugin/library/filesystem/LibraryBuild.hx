@@ -137,8 +137,6 @@ class LibraryBuild
 
 			syncFilesInStagingArea();
 
-			cleanUpIgnoredFiles();
-
 			processFiles();
 
 			cleanUpIgnoredFiles();
