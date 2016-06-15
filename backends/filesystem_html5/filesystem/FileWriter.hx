@@ -64,6 +64,8 @@ class FileWriter
 		fileData.offset = currentSeekPosition;
 		fileData.offsetLength = data.offsetLength;
 		fileData.writeData(data);
+
+		currentSeekPosition = fileData.offset + fileData.offsetLength;
 	}
 
 	public function close()
