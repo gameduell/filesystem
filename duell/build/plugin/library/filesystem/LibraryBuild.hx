@@ -349,7 +349,7 @@ class LibraryBuild
 
 				for (file in newFileList)
 				{
-					if (isFileIgnored(file))
+					if (isFileIgnored(Path.join([folderPath, file])))
 					{
 						continue;
 					}
