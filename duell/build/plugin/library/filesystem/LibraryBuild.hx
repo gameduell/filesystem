@@ -40,6 +40,7 @@ import duell.helpers.PathHelper;
 import duell.helpers.LogHelper;
 import duell.helpers.DirHashHelper;
 import duell.objects.Arguments;
+import duell.helpers.HashHelper;
 
 import haxe.Json;
 import sys.FileSystem;
@@ -50,13 +51,16 @@ using duell.helpers.HashHelper;
 import sys.io.Process;
 
 using StringTools;
+using duell.helpers.HashHelper;
 
 import haxe.io.Path;
 
 typedef FileSystemHash = {
 	PROCESSOR_HASH: Int,
 	FOLDER_HASHES: Map<String, FolderHash>,
-	HASH_VERSION: Int
+	HASH_VERSION: Int,
+	CONFIG_HASH: Int,
+	?CONFIG_DBG: String
 }
 
 typedef FolderHash = {
@@ -207,10 +211,14 @@ class LibraryBuild
 
 	private function generateCurrentHash(): Void
 	{
+		var assetFoldersString = LibraryConfiguration.getData().STATIC_ASSET_FOLDERS.join(";");
+		var ignoreString = LibraryConfiguration.getData().IGNORE_LIST.join(";");
+
 		hash = {
 			PROCESSOR_HASH: HashHelper.getFnv32IntFromIntArray(AssetProcessorRegister.hashList),
 			FOLDER_HASHES: new Map(),
-			HASH_VERSION: HASH_VERSION
+			HASH_VERSION: HASH_VERSION,
+			CONFIG_HASH: '$assetFoldersString&&$ignoreString'.getFnv32IntFromString()
 		};
 
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
@@ -268,13 +276,17 @@ class LibraryBuild
 		previousHash = {
 			PROCESSOR_HASH: 0,
 			FOLDER_HASHES: new Map(),
-			HASH_VERSION: HASH_VERSION
+			HASH_VERSION: HASH_VERSION,
+			CONFIG_HASH: 0
 		}
 	}
 
 	private function compareHashes(): Void
 	{
-		if (hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH || Arguments.isDefineSet("forceAssetProcessing"))
+		var processor = hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH;
+		var argument = Arguments.isDefineSet("forceAssetProcessing");
+		var config = hash.CONFIG_HASH != previousHash.CONFIG_HASH;
+		if (processor || argument)
 		{
 			/// remake all the assets
 			for (key in hash.FOLDER_HASHES.keys())
@@ -287,6 +299,17 @@ class LibraryBuild
 		}
 		else
 		{
+			for (key in previousHash.FOLDER_HASHES.keys())
+			{
+				//detect deleted folder
+				if (!hash.FOLDER_HASHES.exists(key))
+				{
+					trace('$key deleted, full rebuild');
+					fullRebuild = true;
+					break;
+				}
+			}
+
 			for (key in hash.FOLDER_HASHES.keys())
 			{
 				if (previousHash.FOLDER_HASHES.exists(key))
@@ -299,6 +322,7 @@ class LibraryBuild
 				}
 				else
 				{
+					trace('changed: ${hash.FOLDER_HASHES.get(key)}');
 					foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
 				}
 			}
@@ -349,12 +373,13 @@ class LibraryBuild
 
 				for (file in newFileList)
 				{
-					if (isFileIgnored(Path.join([folderPath, file])))
+					var fullFilePath: String = Path.join([fullOriginPath, file]);
+
+					if (isFileIgnored(fullFilePath))
 					{
 						continue;
 					}
 
-					var fullFilePath = Path.join([fullOriginPath, file]);
 					if (!FileSystem.isDirectory(fullFilePath))
 					{
 						originFileList.push({FILE: Path.join([folderPath, file]), ASSET_FOLDER: assetFolder});
@@ -386,6 +411,7 @@ class LibraryBuild
 			{
 				var originPath = Path.join([fileAnon.ASSET_FOLDER, fileAnon.FILE]);
 				var targetPath = Path.join([AssetProcessorRegister.pathToTemporaryAssetArea, fileAnon.FILE]);
+
 				FileHelper.copyIfNewer(originPath, targetPath);
 			}
 		}
