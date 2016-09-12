@@ -26,6 +26,7 @@
 
 package duell.build.plugin.library.filesystem;
 
+import haxe.ds.StringMap;
 import duell.build.plugin.library.filesystem.LibraryConfiguration;
 import duell.build.plugin.platform.PlatformConfiguration;
 import duell.build.objects.Configuration;
@@ -59,7 +60,8 @@ typedef FileSystemHash = {
 	PROCESSOR_HASH: Int,
 	FOLDER_HASHES: Map<String, FolderHash>,
 	HASH_VERSION: Int,
-	CONFIG_HASH: Int,
+	?CONFIG_HASH: Int,
+	?ASSET_FOLDERS: Array<String>,
 	?CONFIG_DBG: String
 }
 
@@ -67,6 +69,13 @@ typedef FolderHash = {
 	FOLDER: String, /// relative to staging
 	HASH: Int,
 	ASSET_FOLDER: String /// path to the configured asset folder
+}
+
+enum ElementStatus
+{
+	New;
+	Deleted;
+	Same;
 }
 
 @:access(duell.build.plugin.library.filesystem.AssetProcessorRegister)
@@ -212,15 +221,17 @@ class LibraryBuild
 	private function generateCurrentHash(): Void
 	{
 		var assetFoldersString = LibraryConfiguration.getData().STATIC_ASSET_FOLDERS.join(";");
-		var ignoreString = LibraryConfiguration.getData().IGNORE_LIST.join(";");
-
+		var ignoreString = LibraryConfiguration.getData().IGNORE_LIST_SRC.join(";");
+		//trace('ignoreString: $ignoreString');
 		hash = {
 			PROCESSOR_HASH: HashHelper.getFnv32IntFromIntArray(AssetProcessorRegister.hashList),
 			FOLDER_HASHES: new Map(),
 			HASH_VERSION: HASH_VERSION,
-			CONFIG_HASH: '$assetFoldersString&&$ignoreString'.getFnv32IntFromString()
+			CONFIG_HASH: '$ignoreString'.getFnv32IntFromString(),
+			ASSET_FOLDERS: LibraryConfiguration.getData().STATIC_ASSET_FOLDERS,
 		};
 
+		//trace('config_hash: ${hash.CONFIG_HASH}');
 		for(folder in LibraryConfiguration.getData().STATIC_ASSET_FOLDERS)
 		{
 			addHashOfFolderRecursively(folder);
@@ -277,7 +288,8 @@ class LibraryBuild
 			PROCESSOR_HASH: 0,
 			FOLDER_HASHES: new Map(),
 			HASH_VERSION: HASH_VERSION,
-			CONFIG_HASH: 0
+			CONFIG_HASH: 0,
+			ASSET_FOLDERS: []
 		}
 	}
 
@@ -286,7 +298,13 @@ class LibraryBuild
 		var processor = hash.PROCESSOR_HASH != previousHash.PROCESSOR_HASH;
 		var argument = Arguments.isDefineSet("forceAssetProcessing");
 		var config = hash.CONFIG_HASH != previousHash.CONFIG_HASH;
-		if (processor || argument)
+		var prevFolders = previousHash.ASSET_FOLDERS == null ? [] : previousHash.ASSET_FOLDERS;
+		var removedAssetFolder = hasDeletedElements(prevFolders, hash.ASSET_FOLDERS);
+
+		//trace('removedAssetFolder: $removedAssetFolder');
+		//trace('config: $config');
+
+		if (processor || argument || removedAssetFolder || config)
 		{
 			/// remake all the assets
 			for (key in hash.FOLDER_HASHES.keys())
@@ -299,17 +317,6 @@ class LibraryBuild
 		}
 		else
 		{
-			for (key in previousHash.FOLDER_HASHES.keys())
-			{
-				//detect deleted folder
-				if (!hash.FOLDER_HASHES.exists(key))
-				{
-					trace('$key deleted, full rebuild');
-					fullRebuild = true;
-					break;
-				}
-			}
-
 			for (key in hash.FOLDER_HASHES.keys())
 			{
 				if (previousHash.FOLDER_HASHES.exists(key))
@@ -322,7 +329,7 @@ class LibraryBuild
 				}
 				else
 				{
-					trace('changed: ${hash.FOLDER_HASHES.get(key)}');
+					//trace('changed: ${hash.FOLDER_HASHES.get(key)}');
 					foldersThatChanged.push(hash.FOLDER_HASHES.get(key));
 				}
 			}
@@ -374,7 +381,6 @@ class LibraryBuild
 				for (file in newFileList)
 				{
 					var fullFilePath: String = Path.join([fullOriginPath, file]);
-
 					if (isFileIgnored(fullFilePath))
 					{
 						continue;
@@ -454,6 +460,7 @@ class LibraryBuild
 	{
 		///fill folders that changed in the assetProcessorRegister
 		var setMap: Map<String, Void> = new Map();
+		//trace('foldersThatChanged $foldersThatChanged');
 		for (folderHash in foldersThatChanged)
 		{
 			setMap.set(folderHash.FOLDER, null);
@@ -505,5 +512,97 @@ class LibraryBuild
 	private function postBuildPerPlatform(): Void
 	{
 		platformBuild.postBuildPerPlatform();
+	}
+
+	private static function findChanges(source: Array<String>, dest: Array<String>, outAdded: Array<String>, outDeleted: Array<String>): Void
+	{
+		compareArrays(source, dest, function(elem: String, status: ElementStatus)
+		{
+			switch(status)
+			{
+				case ElementStatus.New: outAdded.push(elem);
+				case ElementStatus.Deleted: outDeleted.push(elem);
+				default:
+			}
+			return true;
+		});
+	}
+
+	private static function hasDeletedElements(source: Array<String>, dest: Array<String>): Bool
+	{
+		var result = false;
+		compareArrays(source, dest, function(elem: String, status: ElementStatus)
+		{
+			if (status == ElementStatus.Deleted)
+			{
+				//trace('deleted $elem');
+				result = true;
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		});
+
+		return result;
+	}
+	private static function compareArrays(source: Array<String>, dest: Array<String>, onElement: String->ElementStatus->Bool): Void
+	{
+		source.sort(function(a,b) return Reflect.compare(a, b));
+		dest.sort(function(a,b) return Reflect.compare(a, b));
+
+		var srcIdx: Int = 0;
+		var dstIdx: Int = 0;
+
+		//trace('source: $source');
+		//trace('dest: $dest');
+
+		while(srcIdx < source.length && dstIdx < dest.length)
+		{
+			var comp = Reflect.compare(source[srcIdx], dest[dstIdx]);
+			var elem: String;
+			var status = ElementStatus.Same;
+			if (comp > 0)
+			{
+				elem = dest[dstIdx];
+				status = ElementStatus.Deleted;
+				dstIdx++;
+			}
+			else if (comp < 0)
+			{
+				elem = source[srcIdx];
+				status = ElementStatus.New;
+				srcIdx++;
+			}
+			else
+			{
+				elem = source[srcIdx];
+				status = ElementStatus.Same;
+				srcIdx++;
+				dstIdx++;
+			}
+
+			if (!onElement(elem, status))
+			{
+				return;
+			}
+		}
+
+		for (i in srcIdx ... source.length)
+		{
+			if (!onElement(source[i], ElementStatus.Deleted))
+			{
+				return;
+			}
+		}
+
+		for (i in dstIdx ... dest.length)
+		{
+			if (!onElement(dest[i], ElementStatus.New))
+			{
+				return;
+			}
+		}
 	}
 }
