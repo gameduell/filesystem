@@ -90,6 +90,8 @@ class LibraryXMLParser
 
 			var ereg = new EReg(regexPart, flags);
 			LibraryConfiguration.getData().IGNORE_LIST.push(ereg);
+			LibraryConfiguration.getData().IGNORE_LIST_SRC.push(regex);
+
 		}
 	}
 
